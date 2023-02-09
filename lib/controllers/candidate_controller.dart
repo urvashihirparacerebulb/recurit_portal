@@ -16,6 +16,8 @@ class CandidateController extends GetxController {
   RxList<Achievement> candidateAchievementsList = RxList<Achievement>();
   RxList<Identification> identificationList = RxList<Identification>();
   RxList<Certification> certificationList = RxList<Certification>();
+  RxList<Skills> skillsList = RxList<Skills>();
+  RxList<Reference> referencesList = RxList<Reference>();
   Rx<CandidateDetail> candidateDetail = CandidateDetail().obs;
 
   void getCandidateListData() {
@@ -203,6 +205,44 @@ class CandidateController extends GetxController {
         success: (dio.Response<dynamic> response) {
           AchievementsResponseModel achievementsResponseModel = AchievementsResponseModel.fromJson(jsonDecode(response.data));
           candidateAchievementsList.value = achievementsResponseModel.data!.data ?? [];
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
+  void getSkillsInfoList() {
+    apiServiceCall(
+        params: {
+          "manage_user_id": 4,
+          "candidate_id": 275
+        },
+        serviceUrl: ApiConfig.fetchSkillsURL,
+        success: (dio.Response<dynamic> response) {
+          SkillsResponseModel skillsResponseModel = SkillsResponseModel.fromJson(jsonDecode(response.data));
+          skillsList.value = skillsResponseModel.data!.data ?? [];
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
+  void getReferencesList() {
+    apiServiceCall(
+        params: {
+          "manage_user_id": 4,
+          "candidate_id": 275
+        },
+        serviceUrl: ApiConfig.fetchReferencesURL,
+        success: (dio.Response<dynamic> response) {
+          ReferenceResponseModel referenceResponseModel = ReferenceResponseModel.fromJson(jsonDecode(response.data));
+          referencesList.value = referenceResponseModel.data!.data ?? [];
         },
         error: (dio.Response<dynamic> response) {
           errorHandling(response);

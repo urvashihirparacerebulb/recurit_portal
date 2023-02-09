@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../common_widgets/common_textfield.dart';
 import '../common_widgets/common_widgets_view.dart';
+import '../controllers/candidate_controller.dart';
 import '../theme/convert_theme_colors.dart';
 import '../utility/color_utility.dart';
 import '../utility/constants.dart';
@@ -18,13 +19,17 @@ class ReferencesView extends StatefulWidget {
 
 class _ReferencesViewState extends State<ReferencesView> {
 
-  List<String> referencesViews = [];
   TextEditingController nameController = TextEditingController();
   TextEditingController companyNameController = TextEditingController();
   TextEditingController designationController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController mobileController = TextEditingController();
 
+  @override
+  void initState() {
+    CandidateController.to.getReferencesList();
+    super.initState();
+  }
 
   void _showPopupMenu(Offset offset) async {
     double left = offset.dx;
@@ -97,12 +102,12 @@ class _ReferencesViewState extends State<ReferencesView> {
                 ],
               ),
               commonVerticalSpacing(),
-              referencesViews.isNotEmpty ? SizedBox(
+              Obx(() => CandidateController.to.referencesList.isNotEmpty ? SizedBox(
                 height: getScreenHeight(context) - 157,
                 child: ListView(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    children: referencesViews.map((e) => Container(
+                    children: CandidateController.to.referencesList.map((e) => Container(
                       padding: const EdgeInsets.all(12),
                       margin: const EdgeInsets.only(bottom: 20),
                       decoration: neurmorphicBoxDecoration,
@@ -114,41 +119,53 @@ class _ReferencesViewState extends State<ReferencesView> {
                             color: Colors.grey,
                           ),
                           commonHorizontalSpacing(),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  commonHeaderTitle(title: "Name", fontSize: isTablet() ? 1.3 : 1.1, fontWeight: 2),
-                                  commonHeaderTitle(title: "Email", fontSize: isTablet() ? 1.3 : 1.1, fontWeight: 2),
-                                ],
-                              ),
-                              commonVerticalSpacing(),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  commonHeaderTitle(title: "Phone", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                                  Expanded(flex: 2,child: Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: GestureDetector(
-                                          onTapDown: (TapDownDetails details) {
-                                            _showPopupMenu(details.globalPosition);
-                                          },
-                                          child: Container(
-                                              padding: const EdgeInsets.all(5.0),
-                                              decoration: const BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: Color(0xffD9D9D9)
-                                              ),
-                                              child: Icon(Icons.more_vert_rounded,size: isTablet() ? 28 : 20))
-                                      )
-                                  ))
-                                ],
-                              )
-                            ],
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    commonHeaderTitle(title: e.referenceName ?? "", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 2),
+                                    commonHeaderTitle(title: e.referenceDesignation ?? "", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 2),
+                                  ],
+                                ),
+                                commonVerticalSpacing(),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    commonHeaderTitle(title: e.referenceCompanyName ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                                    commonHeaderTitle(title: e.referenceEmail ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                                  ],
+                                ),
+                                commonVerticalSpacing(),
+                                commonHeaderTitle(title: e.referenceEmail ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                                commonVerticalSpacing(),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    commonHeaderTitle(title: e.referencePhone ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                                    Expanded(flex: 2,child: Align(
+                                        alignment: Alignment.bottomRight,
+                                        child: GestureDetector(
+                                            onTapDown: (TapDownDetails details) {
+                                              _showPopupMenu(details.globalPosition);
+                                            },
+                                            child: Container(
+                                                padding: const EdgeInsets.all(5.0),
+                                                decoration: const BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: Color(0xffD9D9D9)
+                                                ),
+                                                child: Icon(Icons.more_vert_rounded,size: isTablet() ? 28 : 20))
+                                        )
+                                    ))
+                                  ],
+                                )
+                              ],
+                            ),
                           )
                         ],
                       ),
@@ -212,25 +229,25 @@ class _ReferencesViewState extends State<ReferencesView> {
                     },),
                   commonVerticalSpacing(spacing: 15),
                   CommonTextFiled(
-                    fieldTitleText: "Mobile *",
-                    hintText: "Mobile *",
-                    // isBorderEnable: false,
-                    textEditingController: mobileController,
-                    inputFormatter: [
-                      LengthLimitingTextInputFormatter(10),
-                      FilteringTextInputFormatter.digitsOnly
-                    ],
-                    keyboardType: TextInputType.number,
-                    preFixIcon: const Icon(Icons.phone,color: blackColor),
-                    onChangedFunction: (String value){
-                    },
-                    validationFunction: (String value) {
-                      return value.toString().isEmpty
-                          ? notEmptyFieldMessage
-                          : null;
-                    })
+                      fieldTitleText: "Mobile *",
+                      hintText: "Mobile *",
+                      // isBorderEnable: false,
+                      textEditingController: mobileController,
+                      inputFormatter: [
+                        LengthLimitingTextInputFormatter(10),
+                        FilteringTextInputFormatter.digitsOnly
+                      ],
+                      keyboardType: TextInputType.number,
+                      preFixIcon: const Icon(Icons.phone,color: blackColor),
+                      onChangedFunction: (String value){
+                      },
+                      validationFunction: (String value) {
+                        return value.toString().isEmpty
+                            ? notEmptyFieldMessage
+                            : null;
+                      })
                 ],
-              )
+              ))
             ],
           ),
         )

@@ -1,7 +1,10 @@
 import 'package:cerebulb_recruit_portal/utility/color_utility.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../common_widgets/common_textfield.dart';
 import '../common_widgets/common_widgets_view.dart';
+import '../controllers/candidate_controller.dart';
+import '../models/candidate_model.dart';
 import '../utility/constants.dart';
 import '../utility/screen_utility.dart';
 
@@ -15,7 +18,12 @@ class SkillsView extends StatefulWidget {
 class _SkillsViewState extends State<SkillsView> {
   TextEditingController skillsController = TextEditingController();
   String selectedSkillTag = "Master";
-  List<SelectedSkills> selectedSkills = [];
+
+  @override
+  void initState() {
+    CandidateController.to.getSkillsInfoList();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,10 +50,10 @@ class _SkillsViewState extends State<SkillsView> {
                     height: 35,
                     tapOnButton: () {
                       setState(() {
-                        SelectedSkills skill = SelectedSkills();
-                        skill.title = skillsController.text;
-                        skill.selectedColor = (selectedSkillTag == "Master" ? "Master" : selectedSkillTag == "Intermediate" ? "Intermediate" : "Beginner");
-                        selectedSkills.add(skill);
+                        Skills skill = Skills();
+                        skill.skill = skillsController.text;
+                        skill.level = (selectedSkillTag == "Master" ? "Master" : selectedSkillTag == "Intermediate" ? "Intermediate" : "Beginner");
+                        CandidateController.to.skillsList.add(skill);
                         skillsController.text = "";
                       });
                     },
@@ -140,34 +148,33 @@ class _SkillsViewState extends State<SkillsView> {
               ],
             ),
             commonVerticalSpacing(spacing: 20),
-            Wrap(
+            Obx(() => Wrap(
               spacing: 8,
               runSpacing: 8,
               direction: Axis.horizontal,
               alignment: WrapAlignment.start,
               crossAxisAlignment: WrapCrossAlignment.start,
               runAlignment: WrapAlignment.start,
-              children: selectedSkills.map((i) => Container(
+              children: CandidateController.to.skillsList.map((i) => Container(
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: selectedSkillTag == "Master" ? greenColor : selectedSkillTag == "Intermediate" ? primaryColor : dangerColor,
-                    )
+                      border: Border.all(
+                        color: i.level == "Master" ? greenColor : i.level == "Intermediate" ? primaryColor : dangerColor,
+                      )
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 5),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(i.title ?? "",style: TextStyle(
-                          color: selectedSkillTag == "Master" ? greenColor : selectedSkillTag == "Intermediate" ? primaryColor : dangerColor,
-                          fontSize: 14
+                      Text(i.skill ?? "",style: TextStyle(
+                          color: i.level == "Master" ? greenColor : i.level == "Intermediate" ? primaryColor : dangerColor,
+                          fontSize: 14,
+                        fontWeight: FontWeight.w500
                       )),
                       commonHorizontalSpacing(),
                       InkWell(
                           onTap: (){
-                            setState(() {
-                              selectedSkills.remove(i);
-                            });
+                            CandidateController.to.skillsList.remove(i);
                           },
                           child: const Icon(Icons.close,
                               color: blackColor,
@@ -175,7 +182,7 @@ class _SkillsViewState extends State<SkillsView> {
                     ],
                   )
               )).toList(),
-            )
+            ))
           ],
         ),
       )
@@ -184,7 +191,7 @@ class _SkillsViewState extends State<SkillsView> {
 }
 
 
-class SelectedSkills{
-  String? title;
-  String? selectedColor;
-}
+// class SelectedSkills{
+//   String? title;
+//   String? selectedColor;
+// }

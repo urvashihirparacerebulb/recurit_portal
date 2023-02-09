@@ -11,6 +11,11 @@ class ApiConfig {
   static const String fetchIdentificationListURL = "${baseURL}fetch-identification";
   static const String fetchCertificationListURL = "${baseURL}fetch-certification";
   static const String fetchAchievementsListURL = "${baseURL}fetch-achievement";
+  static const String fetchSkillsURL = "${baseURL}fetch-skills";
+  static const String fetchReferencesURL = "${baseURL}fetch-reference-info";
+  static const String fetchLanguageInfoURL = "${baseURL}fetch-language-info";
+  static const String fetchQualificationURL = "${baseURL}fetch-qualification";
+  static const String fetchExperienceURL = "${baseURL}fetch-experience";
 
   static const String methodPOST = "post";
   static const String methodGET = "get";

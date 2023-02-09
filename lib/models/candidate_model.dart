@@ -661,3 +661,167 @@ class Achievement {
     "manage_user_id": manageUserId,
   };
 }
+
+class SkillsResponseModel {
+  SkillsResponseModel({
+    this.statusCode,
+    this.status,
+    this.message,
+    this.data,
+  });
+
+  int? statusCode;
+  bool? status;
+  String? message;
+  SkillsResponse? data;
+
+  factory SkillsResponseModel.fromJson(Map<String, dynamic> json) => SkillsResponseModel(
+    statusCode: json["statusCode"],
+    status: json["status"],
+    message: json["message"],
+    data: SkillsResponse.fromJson(json["data"]),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "statusCode": statusCode,
+    "status": status,
+    "message": message,
+    "data": data?.toJson(),
+  };
+}
+
+class SkillsResponse {
+  SkillsResponse({
+    this.data,
+  });
+
+  List<Skills>? data;
+
+  factory SkillsResponse.fromJson(Map<String, dynamic> json) => SkillsResponse(
+    data: List<Skills>.from(json["data"].map((x) => Skills.fromJson(x))),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "data": data == null ? [] : List<dynamic>.from(data!.map((x) => x.toJson())),
+  };
+}
+
+class Skills {
+  Skills({
+    this.candidateId,
+    this.skill,
+    this.level,
+    this.status,
+    this.manageUserId,
+  });
+
+  int? candidateId;
+  String? skill;
+  String? level;
+  String? status;
+  int? manageUserId;
+
+  factory Skills.fromJson(Map<String, dynamic> json) => Skills(
+    candidateId: json["candidate_id"],
+    skill: json["skill"],
+    level: json["level"],
+    status: json["status"],
+    manageUserId: json["manage_user_id"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "candidate_id": candidateId,
+    "skill": skill,
+    "level": level,
+    "status": status,
+    "manage_user_id": manageUserId,
+  };
+}
+
+class ReferenceResponseModel {
+  ReferenceResponseModel({
+    this.statusCode,
+    this.status,
+    this.message,
+    this.data,
+  });
+
+  int? statusCode;
+  bool? status;
+  String? message;
+  ReferenceResponse? data;
+
+  factory ReferenceResponseModel.fromJson(Map<String, dynamic> json) => ReferenceResponseModel(
+    statusCode: json["statusCode"],
+    status: json["status"],
+    message: json["message"],
+    data: ReferenceResponse.fromJson(json["data"]),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "statusCode": statusCode,
+    "status": status,
+    "message": message,
+    "data": data?.toJson(),
+  };
+}
+
+class ReferenceResponse {
+  ReferenceResponse({
+    this.data,
+  });
+
+  List<Reference>? data;
+
+  factory ReferenceResponse.fromJson(Map<String, dynamic> json) => ReferenceResponse(
+    data: List<Reference>.from(json["data"].map((x) => Reference.fromJson(x))),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "data": data == null ? [] : List<dynamic>.from(data!.map((x) => x.toJson())),
+  };
+}
+
+class Reference {
+  Reference({
+    this.candidateId,
+    this.referenceName,
+    this.referenceDesignation,
+    this.referenceEmail,
+    this.referenceCompanyName,
+    this.referencePhoneDialCode,
+    this.referencePhoneCountryCode,
+    this.referencePhone,
+  });
+
+  int? candidateId;
+  String? referenceName;
+  String? referenceDesignation;
+  String? referenceEmail;
+  String? referenceCompanyName;
+  String? referencePhoneDialCode;
+  String? referencePhoneCountryCode;
+  String? referencePhone;
+
+  factory Reference.fromJson(Map<String, dynamic> json) => Reference(
+    candidateId: json["candidate_id"],
+    referenceName: json["reference_name"],
+    referenceDesignation: json["reference_designation"],
+    referenceEmail: json["reference_email"],
+    referenceCompanyName: json["reference_company_name"],
+    referencePhoneDialCode: json["reference_phone_dial_code"],
+    referencePhoneCountryCode: json["reference_phone_country_code"],
+    referencePhone: json["reference_phone"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "candidate_id": candidateId,
+    "reference_name": referenceName,
+    "reference_designation": referenceDesignation,
+    "reference_email": referenceEmail,
+    "reference_company_name": referenceCompanyName,
+    "reference_phone_dial_code": referencePhoneDialCode,
+    "reference_phone_country_code": referencePhoneCountryCode,
+    "reference_phone": referencePhone,
+  };
+}
