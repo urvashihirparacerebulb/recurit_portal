@@ -154,6 +154,62 @@ void commonBottomView(
       });
 }
 
+Widget commonBorderButtonView(
+    {required BuildContext context,
+      required String title,
+      required Function tapOnButton,
+      required bool isLoading,
+      Color? color,
+      double height = 50,
+      IconData? iconData}) {
+  return Container(
+    decoration: neurmorphicBoxDecoration,
+    width: MediaQuery.of(context).size.width - (commonHorizontalPadding * 2),
+    height: height,
+    child: ElevatedButton(
+      onPressed: () {
+        if (!isLoading) {
+          tapOnButton();
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        // shadowColor: blackColor.withOpacity(0.8),
+        alignment: Alignment.center,
+        primary: ConvertTheme.convertTheme.getBackGroundColor(),
+        // side: const BorderSide(
+        //   color: blackColor,
+        //   width: 1.0,
+        // ),
+        shape: RoundedRectangleBorder(
+          borderRadius: commonBorderRadius,
+        ),
+        padding: EdgeInsets.symmetric(vertical: height == 50.0 ? 15 : 2),
+        elevation: 0.0,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            title,
+            style: black15PxW800.copyWith(
+                color: blackColor,
+                fontWeight: FontWeight.bold,
+                fontSize: height >= 50.0 ? 16 : 12),
+          ),
+          iconData != null ? commonHorizontalSpacing() : const SizedBox(),
+          iconData != null
+              ? Icon(
+            iconData,
+            size: 20,
+            color: blackColor,
+          )
+              : const SizedBox(),
+        ],
+      ),
+    ),
+  );
+}
 
 Widget commonFillButtonView(
     {required BuildContext context,

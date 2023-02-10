@@ -1,6 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../configurations/config_file.dart';
+import '../main.dart';
+import '../models/login_response_model.dart';
 import 'color_utility.dart';
 
 isNotEmptyString(String? string) {
@@ -8,6 +13,33 @@ isNotEmptyString(String? string) {
 }
 double commonHorizontalPadding = 10.0;
 
+setIsLogin({required bool isLogin}) {
+  getPreferences.write('isLogin', isLogin);
+}
+
+bool getIsLogin() {
+  return (getPreferences.read('isLogin') ?? false);
+}
+
+setObject(String key, value) {
+  getPreferences.write(key, json.encode(value));
+}
+
+getObject(String key) {
+  return getPreferences.read(key) != null
+      ? json.decode(getPreferences.read(key))
+      : null;
+}
+
+LoginResponseModel? getLoginData() {
+  if (getObject(ApiConfig.loginPref) != null) {
+    LoginResponseModel loginResponse =
+    LoginResponseModel.fromJson(getObject(ApiConfig.loginPref));
+    return loginResponse;
+  } else {
+    return null;
+  }
+}
 
 Future<DateTime> openCalendarView(BuildContext buildContext, {int selectedYear = 15,
   required String initialDate, String? firstDate}) async {

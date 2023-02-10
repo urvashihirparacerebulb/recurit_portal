@@ -44,6 +44,7 @@ class CandidateListResponse {
 
 class CandidateList {
   CandidateList({
+    this.candidateId,
     this.candidateUniqueId,
     this.name,
     this.email,
@@ -52,6 +53,7 @@ class CandidateList {
     this.status,
   });
 
+  num? candidateId;
   String? candidateUniqueId;
   String? name;
   String? email;
@@ -60,6 +62,7 @@ class CandidateList {
   String? status;
 
   factory CandidateList.fromJson(Map<String, dynamic> json) => CandidateList(
+    candidateId: json["candidate_id"],
     candidateUniqueId: json["candidate_unique_id"],
     name: json["name"],
     email: json["email"],
@@ -69,6 +72,7 @@ class CandidateList {
   );
 
   Map<String, dynamic> toJson() => {
+    "candidate_id": candidateId,
     "candidate_unique_id": candidateUniqueId,
     "name": name,
     "email": email,
@@ -521,6 +525,7 @@ class CertificationResponse {
 class Certification {
   Certification({
     this.candidateId,
+    this.id,
     this.certificateName,
     this.issuingOrganization,
     this.issueMonth,
@@ -534,6 +539,7 @@ class Certification {
   });
 
   int? candidateId;
+  String? id;
   String? certificateName;
   String? issuingOrganization;
   String? issueMonth;
@@ -547,6 +553,7 @@ class Certification {
 
   factory Certification.fromJson(Map<String, dynamic> json) => Certification(
     candidateId: json["candidate_id"],
+    id: json["id"],
     certificateName: json["certificate_name"],
     issuingOrganization: json["issuing_organization"],
     issueMonth: json["issue_month"],
@@ -561,6 +568,7 @@ class Certification {
 
   Map<String, dynamic> toJson() => {
     "candidate_id": candidateId,
+    "id": id,
     "certificate_name": certificateName,
     "issuing_organization": issuingOrganization,
     "issue_month": issueMonth,
@@ -823,5 +831,285 @@ class Reference {
     "reference_phone_dial_code": referencePhoneDialCode,
     "reference_phone_country_code": referencePhoneCountryCode,
     "reference_phone": referencePhone,
+  };
+}
+
+class LanguageResponseModel {
+  LanguageResponseModel({
+    this.statusCode,
+    this.status,
+    this.message,
+    this.data,
+  });
+
+  int? statusCode;
+  bool? status;
+  String? message;
+  LanguageResponse? data;
+
+  factory LanguageResponseModel.fromJson(Map<String, dynamic> json) => LanguageResponseModel(
+    statusCode: json["statusCode"],
+    status: json["status"],
+    message: json["message"],
+    data: LanguageResponse.fromJson(json["data"]),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "statusCode": statusCode,
+    "status": status,
+    "message": message,
+    "data": data?.toJson(),
+  };
+}
+
+class LanguageResponse {
+  LanguageResponse({
+    this.data,
+  });
+
+  List<Language>? data;
+
+  factory LanguageResponse.fromJson(Map<String, dynamic> json) => LanguageResponse(
+    data: List<Language>.from(json["data"].map((x) => Language.fromJson(x))),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "data": data == null ? [] : List<dynamic>.from(data!.map((x) => x.toJson())),
+  };
+}
+
+class Language {
+  Language({
+    this.language,
+    this.read,
+    this.write,
+    this.speak,
+  });
+
+  String? language;
+  String? read;
+  String? write;
+  String? speak;
+
+  factory Language.fromJson(Map<String, dynamic> json) => Language(
+    language: json["language"],
+    read: json["read"],
+    write: json["write"],
+    speak: json["speak"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "language": language,
+    "read": read,
+    "write": write,
+    "speak": speak,
+  };
+}
+
+class QualificationResponseModel {
+  QualificationResponseModel({
+    this.statusCode,
+    this.status,
+    this.message,
+    this.data,
+  });
+
+  int? statusCode;
+  bool? status;
+  String? message;
+  QualificationResponse? data;
+
+  factory QualificationResponseModel.fromJson(Map<String, dynamic> json) => QualificationResponseModel(
+    statusCode: json["statusCode"],
+    status: json["status"],
+    message: json["message"],
+    data: QualificationResponse.fromJson(json["data"]),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "statusCode": statusCode,
+    "status": status,
+    "message": message,
+    "data": data?.toJson(),
+  };
+}
+
+class QualificationResponse {
+  QualificationResponse({
+    this.data,
+  });
+
+  List<Qualification>? data;
+
+  factory QualificationResponse.fromJson(Map<String, dynamic> json) => QualificationResponse(
+    data: List<Qualification>.from(json["data"].map((x) => Qualification.fromJson(x))),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "data": data == null ? [] : List<dynamic>.from(data!.map((x) => x.toJson())),
+  };
+}
+
+class Qualification {
+  Qualification({
+    this.candidateId,
+    this.instituteName,
+    this.departmentName,
+    this.degreeName,
+    this.fromMonth,
+    this.toMonth,
+    this.persuing,
+    this.marksheet,
+    this.certificate,
+    this.status,
+    this.manageUserId,
+  });
+
+  int? candidateId;
+  String? instituteName;
+  String? departmentName;
+  String? degreeName;
+  String? fromMonth;
+  String? toMonth;
+  String? persuing;
+  String? marksheet;
+  String? certificate;
+  String? status;
+  int? manageUserId;
+
+  factory Qualification.fromJson(Map<String, dynamic> json) => Qualification(
+    candidateId: json["candidate_id"],
+    instituteName: json["institute_name"],
+    departmentName: json["department_name"],
+    degreeName: json["degree_name"],
+    fromMonth: json["from_month"],
+    toMonth: json["to_month"],
+    persuing: json["persuing"],
+    marksheet: json["marksheet"],
+    certificate: json["certificate"],
+    status: json["status"],
+    manageUserId: json["manage_user_id"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "candidate_id": candidateId,
+    "institute_name": instituteName,
+    "department_name": departmentName,
+    "degree_name": degreeName,
+    "from_month": fromMonth,
+    "to_month": toMonth,
+    "persuing": persuing,
+    "marksheet": marksheet,
+    "certificate": certificate,
+    "status": status,
+    "manage_user_id": manageUserId,
+  };
+}
+
+class ExperienceResponseModel {
+  ExperienceResponseModel({
+    this.statusCode,
+    this.status,
+    this.message,
+    this.data,
+  });
+
+  int? statusCode;
+  bool? status;
+  String? message;
+  ExperienceResponse? data;
+
+  factory ExperienceResponseModel.fromJson(Map<String, dynamic> json) => ExperienceResponseModel(
+    statusCode: json["statusCode"],
+    status: json["status"],
+    message: json["message"],
+    data: ExperienceResponse.fromJson(json["data"]),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "statusCode": statusCode,
+    "status": status,
+    "message": message,
+    "data": data?.toJson(),
+  };
+}
+
+class ExperienceResponse {
+  ExperienceResponse({
+    this.data,
+  });
+
+  List<Experience>? data;
+
+  factory ExperienceResponse.fromJson(Map<String, dynamic> json) => ExperienceResponse(
+    data: List<Experience>.from(json["data"].map((x) => Experience.fromJson(x))),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "data": data == null ? [] : List<dynamic>.from(data!.map((x) => x.toJson())),
+  };
+}
+
+class Experience {
+  Experience({
+    this.candidateId,
+    this.occupationName,
+    this.companyName,
+    this.responsibility,
+    this.fromMonths,
+    this.toMonths,
+    this.offerLetter,
+    this.salarySlip,
+    this.relievingLetter,
+    this.experienceLetter,
+    this.otherAttachement,
+    this.status,
+    this.manageUserId,
+  });
+
+  int? candidateId;
+  String? occupationName;
+  String? companyName;
+  String? responsibility;
+  String? fromMonths;
+  String? toMonths;
+  String? offerLetter;
+  String? salarySlip;
+  String? relievingLetter;
+  String? experienceLetter;
+  String? otherAttachement;
+  String? status;
+  int? manageUserId;
+
+  factory Experience.fromJson(Map<String, dynamic> json) => Experience(
+    candidateId: json["candidate_id"],
+    occupationName: json["occupation_name"],
+    companyName: json["company_name"],
+    responsibility: json["responsibility"],
+    fromMonths: json["from_months"],
+    toMonths: json["to_months"],
+    offerLetter: json["offer_letter"],
+    salarySlip: json["salary_slip"],
+    relievingLetter: json["relieving_letter"],
+    experienceLetter: json["experience_letter"],
+    otherAttachement: json["other_attachement"],
+    status: json["status"],
+    manageUserId: json["manage_user_id"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "candidate_id": candidateId,
+    "occupation_name": occupationName,
+    "company_name": companyName,
+    "responsibility": responsibility,
+    "from_months": fromMonths,
+    "to_months": toMonths,
+    "offer_letter": offerLetter,
+    "salary_slip": salarySlip,
+    "relieving_letter": relievingLetter,
+    "experience_letter": experienceLetter,
+    "other_attachement": otherAttachement,
+    "status": status,
+    "manage_user_id": manageUserId,
   };
 }

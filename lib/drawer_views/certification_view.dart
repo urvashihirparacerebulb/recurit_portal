@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cerebulb_recruit_portal/models/candidate_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,6 +12,7 @@ import '../controllers/candidate_controller.dart';
 import '../theme/convert_theme_colors.dart';
 import '../utility/color_utility.dart';
 import '../utility/constants.dart';
+import '../utility/delete_dialog_view.dart';
 import '../utility/screen_utility.dart';
 
 class CertificationView extends StatefulWidget {
@@ -95,7 +97,7 @@ class _CertificationViewState extends State<CertificationView> {
     );
   }
 
-  void _showPopupMenu(Offset offset) async {
+  void _showPopupMenu(Offset offset,{Certification? certification}) async {
     double left = offset.dx;
     double top = offset.dy;
     await showMenu(
@@ -127,6 +129,9 @@ class _CertificationViewState extends State<CertificationView> {
               child: InkWell(
                   onTap: (){
                     Get.back();
+                    showDialog(context: context, builder: (BuildContext context) => DeleteDialogView(doneCallback: (){
+                      CandidateController.to.deleteCertificate(certificationId: certification!.id ?? "");
+                    }));
                   },
                   child: Row(
                     children: [
@@ -218,7 +223,7 @@ class _CertificationViewState extends State<CertificationView> {
                                   alignment: Alignment.bottomRight,
                                   child: GestureDetector(
                                       onTapDown: (TapDownDetails details) {
-                                        _showPopupMenu(details.globalPosition);
+                                        _showPopupMenu(details.globalPosition, certification: e);
                                       },
                                       child: Container(
                                           padding: const EdgeInsets.all(5.0),

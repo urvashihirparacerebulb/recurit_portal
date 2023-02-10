@@ -45,6 +45,13 @@ String? tempMethodType;
 // 200: response, string/null
 // 422: array
 
+String getLoginDataValue(){
+  if(getLoginData() != null){
+    return getLoginData()!.data?.token ?? "";
+  }
+  return "";
+}
+
 apiServiceCall({
   required Map<String, dynamic> params,
   required String serviceUrl,
@@ -76,7 +83,7 @@ apiServiceCall({
       showProgressDialog();
     }
     Map<String, dynamic> headerParameters;
-    if (headerToken == "") {
+    if (getLoginDataValue() == "") {
       headerParameters = {
         'Access-Control-Allow-Origin': '*',
         // "Authorization": getLoginData() != null
@@ -86,7 +93,7 @@ apiServiceCall({
         //     : "",
       };
     } else {
-      headerParameters = {"Authorization": "Bearer $headerToken"};
+      headerParameters = {"Authorization": "Bearer ${getLoginDataValue()}"};
     }
 
     try {

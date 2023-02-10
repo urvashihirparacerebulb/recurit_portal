@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../common_widgets/common_textfield.dart';
 import '../common_widgets/common_widgets_view.dart';
+import '../controllers/candidate_controller.dart';
 import '../theme/convert_theme_colors.dart';
 import '../utility/constants.dart';
 import '../utility/screen_utility.dart';
@@ -17,11 +18,16 @@ class LanguagesView extends StatefulWidget {
 
 class _LanguagesViewState extends State<LanguagesView> {
 
-  List<String> languagesViews = ["dsdsd","cdsff"];
   TextEditingController languageNameController = TextEditingController();
   bool isRead = false;
   bool isWrite = false;
   bool isSpeak = false;
+
+  @override
+  void initState() {
+    CandidateController.to.getLanguagesList();
+    super.initState();
+  }
 
   void _showPopupMenu(Offset offset) async {
     double left = offset.dx;
@@ -94,12 +100,12 @@ class _LanguagesViewState extends State<LanguagesView> {
                 ],
               ),
               commonVerticalSpacing(),
-              languagesViews.isNotEmpty ? SizedBox(
+              Obx(() => CandidateController.to.languagesList.isNotEmpty ? SizedBox(
                 height: getScreenHeight(context) - 157,
                 child: ListView(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    children: languagesViews.map((e) => Container(
+                    children: CandidateController.to.languagesList.map((e) => Container(
                       padding: const EdgeInsets.all(12),
                       margin: const EdgeInsets.only(bottom: 20),
                       decoration: neurmorphicBoxDecoration,
@@ -111,7 +117,7 @@ class _LanguagesViewState extends State<LanguagesView> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              commonHeaderTitle(title: "Name", fontSize: isTablet() ? 1.3 : 1.1, fontWeight: 2),
+                              commonHeaderTitle(title: e.language ?? "", fontSize: isTablet() ? 1.3 : 1.1, fontWeight: 2),
                               Expanded(flex: 2,child: Align(
                                   alignment: Alignment.bottomRight,
                                   child: GestureDetector(
@@ -138,7 +144,8 @@ class _LanguagesViewState extends State<LanguagesView> {
                                 children: [
                                   commonHeaderTitle(title: "READ", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
                                   commonVerticalSpacing(),
-                                  const Icon(Icons.check_circle_outline,color: greenColor)
+                                  e.read != null && (e.read == "Yes") ? const Icon(Icons.check_circle_outline,color: greenColor) :
+                                  const Icon(Icons.close,color: dangerColor)
                                 ],
                               )),
 
@@ -147,6 +154,7 @@ class _LanguagesViewState extends State<LanguagesView> {
                                 children: [
                                   commonHeaderTitle(title: "WRITE", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
                                   commonVerticalSpacing(),
+                                  e.write != null && (e.write == "Yes") ? const Icon(Icons.check_circle_outline,color: greenColor) :
                                   const Icon(Icons.close,color: dangerColor)
                                 ],
                               )),
@@ -156,7 +164,8 @@ class _LanguagesViewState extends State<LanguagesView> {
                                 children: [
                                   commonHeaderTitle(title: "SPEAK", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
                                   commonVerticalSpacing(),
-                                  const Icon(Icons.check_circle_outline,color: greenColor)
+                                  e.speak != null && (e.speak == "Yes") ? const Icon(Icons.check_circle_outline,color: greenColor) :
+                                  const Icon(Icons.close,color: dangerColor)
                                 ],
                               ))
                             ],
@@ -198,7 +207,7 @@ class _LanguagesViewState extends State<LanguagesView> {
                     });
                   },isSelected: isSpeak),
                 ],
-              )
+              ))
             ],
           ),
         )

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cerebulb_recruit_portal/theme/theme_service.dart';
 import 'package:cerebulb_recruit_portal/utility/constants.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,9 @@ import 'package:get_storage/get_storage.dart';
 import 'app_binding/app_bindings.dart';
 import 'candidate/candidate_list_view.dart';
 import 'common_widgets/common_methods.dart';
+import 'controllers/general_controller.dart';
+import 'login/login_screen.dart';
+import 'utility/common_methods.dart';
 
 final getPreferences = GetStorage();
 
@@ -65,7 +70,32 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    Future.delayed(const Duration(milliseconds: 10), () {
+      GeneralController.to.isDarkMode.value = ThemeService().loadThemeFromBox();
+    });
+    Timer(const Duration(seconds: 2), () {
+      if (getIsLogin()) {
+        Get.off(() => const CandidateListView());
+      } else {
+        Get.off(() => const LoginScreen());
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    if (readThemePref() == systemDefault) {
+      systemDefaultTheme();
+    }
+    super.didChangePlatformBrightness();
+  }
+
 
   @override
   Widget build(BuildContext context) {

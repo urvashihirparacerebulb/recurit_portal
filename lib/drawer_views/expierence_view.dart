@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../common_widgets/common_textfield.dart';
 import '../common_widgets/common_widgets_view.dart';
+import '../controllers/candidate_controller.dart';
 import '../theme/convert_theme_colors.dart';
 import '../utility/color_utility.dart';
 import '../utility/constants.dart';
@@ -21,7 +22,6 @@ class ExpierenceView extends StatefulWidget {
 
 class _ExpierenceViewState extends State<ExpierenceView> {
 
-  List<String> expViews = [];
   TextEditingController profileNameController = TextEditingController();
   TextEditingController companyNameController = TextEditingController();
   TextEditingController responsibilityController = TextEditingController();
@@ -34,6 +34,12 @@ class _ExpierenceViewState extends State<ExpierenceView> {
   File? experienceLetterImage;
   File? salarySlipImage;
   File? otherAttachmentImage;
+
+  @override
+  void initState() {
+    CandidateController.to.getExperiencesList();
+    super.initState();
+  }
 
   imageView({String title = "", Function? onChanged, File? selectedFile}) {
     return SizedBox(
@@ -178,56 +184,55 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                 ],
               ),
               commonVerticalSpacing(),
-              expViews.isNotEmpty ? SizedBox(
+              Obx(() => CandidateController.to.experiencesList.isNotEmpty ? SizedBox(
                 height: getScreenHeight(context) - 157,
                 child: ListView(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    children: expViews.map((e) => Container(
+                    children: CandidateController.to.experiencesList.map((e) => Container(
                       padding: const EdgeInsets.all(12),
                       margin: const EdgeInsets.only(bottom: 20),
                       decoration: neurmorphicBoxDecoration,
-                      child: Row(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Container(
-                            height: 100,
-                            width: 100,
-                            color: Colors.grey,
-                          ),
-                          commonHorizontalSpacing(),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  commonHeaderTitle(title: "Occupation Name", fontSize: isTablet() ? 1.3 : 1.1, fontWeight: 2),
-                                  commonHeaderTitle(title: "Company Name", fontSize: isTablet() ? 1.3 : 1.1, fontWeight: 2),
-                                ],
-                              ),
-                              commonVerticalSpacing(),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  commonHeaderTitle(title: "Year", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                                  Expanded(flex: 2,child: Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: GestureDetector(
-                                          onTapDown: (TapDownDetails details) {
-                                            _showPopupMenu(details.globalPosition);
-                                          },
-                                          child: Container(
-                                              padding: const EdgeInsets.all(5.0),
-                                              decoration: const BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: Color(0xffD9D9D9)
-                                              ),
-                                              child: Icon(Icons.more_vert_rounded,size: isTablet() ? 28 : 20))
-                                      )
-                                  ))                                ],
-                              )
+                              commonHeaderTitle(title: e.occupationName ?? "", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 2),
+                              commonHeaderTitle(title: e.companyName ?? "", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 2),
+                            ],
+                          ),
+                          commonVerticalSpacing(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              commonHeaderTitle(title: e.fromMonths ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                              commonHeaderTitle(title: e.toMonths ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                            ],
+                          ),
+                          commonVerticalSpacing(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              commonHeaderTitle(title: e.responsibility ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                              Expanded(flex: 2,child: Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: GestureDetector(
+                                      onTapDown: (TapDownDetails details) {
+                                        _showPopupMenu(details.globalPosition);
+                                      },
+                                      child: Container(
+                                          padding: const EdgeInsets.all(5.0),
+                                          decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Color(0xffD9D9D9)
+                                          ),
+                                          child: Icon(Icons.more_vert_rounded,size: isTablet() ? 28 : 20))
+                                  )
+                              ))
                             ],
                           )
                         ],
@@ -351,9 +356,8 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                       otherAttachmentImage = file;
                     });
                   },selectedFile: otherAttachmentImage),
-
                 ],
-              )
+              ))
             ],
           ),
         )

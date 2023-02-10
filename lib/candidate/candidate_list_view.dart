@@ -37,6 +37,7 @@ class _CandidateListViewState extends State<CandidateListView> {
           itemBuilder: (context, index) {
             return InkWell(
               onTap: (){
+                // CandidateController.to.candidateId.value = (CandidateController.to.candidateList[index].candidateId ?? "").toString();
                 Get.to(() => const DashboardScreen());
               },
               child: Container(

@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../common_widgets/common_textfield.dart';
 import '../common_widgets/common_widgets_view.dart';
+import '../controllers/candidate_controller.dart';
 import '../theme/convert_theme_colors.dart';
 import '../utility/color_utility.dart';
 import '../utility/constants.dart';
@@ -20,7 +21,6 @@ class QualificationView extends StatefulWidget {
 }
 
 class _QualificationViewState extends State<QualificationView> {
-  List<String> qualificationViews = [];
   File? marksheetImage;
   File? certificateImage;
   TextEditingController instituteNameController = TextEditingController();
@@ -29,6 +29,12 @@ class _QualificationViewState extends State<QualificationView> {
   String durationFrom = "";
   String durationTo = "";
   bool isCurrentlyPersuing = false;
+
+  @override
+  void initState() {
+    CandidateController.to.getQualificationsList();
+    super.initState();
+  }
 
   imageView({String title = "", Function? onChanged, File? selectedFile}) {
     return SizedBox(
@@ -173,57 +179,54 @@ class _QualificationViewState extends State<QualificationView> {
                 ],
               ),
               commonVerticalSpacing(),
-              qualificationViews.isNotEmpty ? SizedBox(
+              Obx(() => CandidateController.to.qualificationsList.isNotEmpty ? SizedBox(
                 height: getScreenHeight(context) - 157,
                 child: ListView(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    children: qualificationViews.map((e) => Container(
+                    children: CandidateController.to.qualificationsList.map((e) => Container(
                       padding: const EdgeInsets.all(12),
                       margin: const EdgeInsets.only(bottom: 20),
                       decoration: neurmorphicBoxDecoration,
-                      child: Row(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Container(
-                            height: 100,
-                            width: 100,
-                            color: Colors.grey,
+                          commonHeaderTitle(title: e.instituteName ?? "", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 2),
+                          commonVerticalSpacing(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              commonHeaderTitle(title: e.departmentName ?? "", fontSize: isTablet() ? 1.3 : 1.1, fontWeight: 1),
+                              commonHeaderTitle(title: e.degreeName ?? "", fontSize: isTablet() ? 1.3 : 1.1, fontWeight: 1),
+                            ],
                           ),
-                          commonHorizontalSpacing(),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
+                          commonVerticalSpacing(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  commonHeaderTitle(title: "Institute Name", fontSize: isTablet() ? 1.3 : 1.1, fontWeight: 2),
-                                  commonHeaderTitle(title: "Degree Name", fontSize: isTablet() ? 1.3 : 1.1, fontWeight: 2),
+                                  commonHeaderTitle(title: e.fromMonth ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                                  commonHeaderTitle(title: e.toMonth ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1)
                                 ],
                               ),
-                              commonVerticalSpacing(),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  commonHeaderTitle(title: "Duration", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                                  Expanded(flex: 2,child: Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: GestureDetector(
-                                          onTapDown: (TapDownDetails details) {
-                                            _showPopupMenu(details.globalPosition);
-                                          },
-                                          child: Container(
-                                              padding: const EdgeInsets.all(5.0),
-                                              decoration: const BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: Color(0xffD9D9D9)
-                                              ),
-                                              child: Icon(Icons.more_vert_rounded,size: isTablet() ? 28 : 20))
-                                      )
-                                  ))
-                                ],
-                              )
+                              Expanded(flex: 2,child: Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: GestureDetector(
+                                      onTapDown: (TapDownDetails details) {
+                                        _showPopupMenu(details.globalPosition);
+                                      },
+                                      child: Container(
+                                          padding: const EdgeInsets.all(5.0),
+                                          decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Color(0xffD9D9D9)
+                                          ),
+                                          child: Icon(Icons.more_vert_rounded,size: isTablet() ? 28 : 20))
+                                  )
+                              ))
                             ],
                           )
                         ],
@@ -304,7 +307,7 @@ class _QualificationViewState extends State<QualificationView> {
                           padding: const EdgeInsets.all(18),
                           decoration: neurmorphicBoxDecoration,
                           child: commonHeaderTitle(
-                            title: durationTo.isEmpty ? "Duration To" : durationTo
+                              title: durationTo.isEmpty ? "Duration To" : durationTo
                           ),
                         ),
                       ))
@@ -329,7 +332,7 @@ class _QualificationViewState extends State<QualificationView> {
                     });
                   },selectedFile: certificateImage),
                 ],
-              )
+              ))
             ],
           ),
         )

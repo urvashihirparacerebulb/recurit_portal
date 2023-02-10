@@ -1,6 +1,7 @@
 class ApiConfig {
 
   static const String baseURL = "https://recruit.cerebulb.com/api/";
+  static const String loginURL = "${baseURL}login";
   static const String candidateListURL = "${baseURL}candidate-list";
   static const String fetchBasicDetailURL = "${baseURL}fetch-candidate-basic-info";
   static const String fetchAddressURL = "${baseURL}fetch-candidate-address-info";
@@ -16,6 +17,8 @@ class ApiConfig {
   static const String fetchLanguageInfoURL = "${baseURL}fetch-language-info";
   static const String fetchQualificationURL = "${baseURL}fetch-qualification";
   static const String fetchExperienceURL = "${baseURL}fetch-experience";
+
+  static const String deleteCertificateURL = "${baseURL}delete-candidate-certification/";
 
   static const String methodPOST = "post";
   static const String methodGET = "get";
