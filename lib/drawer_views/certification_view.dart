@@ -130,7 +130,7 @@ class _CertificationViewState extends State<CertificationView> {
                   onTap: (){
                     Get.back();
                     showDialog(context: context, builder: (BuildContext context) => DeleteDialogView(doneCallback: (){
-                      CandidateController.to.deleteCertificate(certificationId: certification!.id ?? "");
+                      CandidateController.to.deleteCertificate(certificationId: (certification!.id ?? "").toString());
                     }));
                   },
                   child: Row(

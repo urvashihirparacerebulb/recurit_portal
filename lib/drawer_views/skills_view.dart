@@ -6,6 +6,7 @@ import '../common_widgets/common_widgets_view.dart';
 import '../controllers/candidate_controller.dart';
 import '../models/candidate_model.dart';
 import '../utility/constants.dart';
+import '../utility/delete_dialog_view.dart';
 import '../utility/screen_utility.dart';
 
 class SkillsView extends StatefulWidget {
@@ -174,7 +175,11 @@ class _SkillsViewState extends State<SkillsView> {
                       commonHorizontalSpacing(),
                       InkWell(
                           onTap: (){
-                            CandidateController.to.skillsList.remove(i);
+                            // CandidateController.to.skillsList.remove(i);
+                            // Get.back();
+                            showDialog(context: context, builder: (BuildContext context) => DeleteDialogView(doneCallback: (){
+                              CandidateController.to.deleteSkill(skillId: (i.id ?? "").toString());
+                            }));
                           },
                           child: const Icon(Icons.close,
                               color: blackColor,

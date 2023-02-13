@@ -41,6 +41,9 @@ class _AddressViewState extends State<AddressView> {
       houseNumController.text = val.blockHouseNo ?? "";
       streetLocalityController.text = val.streetLocality ?? "";
       landmarkController.text = val.landmark ?? "";
+      countryController.text = val.countryName ?? "";
+      stateController.text = val.stateName ?? "";
+      cityController.text = val.cityName ?? "";
 
       if(val.sameCorrespondenceAddress == 1){
         isAddressSame = true;
@@ -48,6 +51,9 @@ class _AddressViewState extends State<AddressView> {
       correspondenceHouseNumController.text = val.cblockHouseNo ?? "";
       correspondenceStreetLocalityController.text = val.cstreet ?? "";
       correspondenceLandmarkController.text = val.clandmark ?? "";
+      correspondenceCountryController.text = val.correspondenceCountryName ?? "";
+      correspondenceStateController.text = val.correspondenceStateName ?? "";
+      correspondenceCityController.text = val.correspondenceCityName ?? "";
 
       setState(() {});
     });
@@ -109,7 +115,7 @@ class _AddressViewState extends State<AddressView> {
                   commonBottomView(context: context,
                       child: CommonBottomStringView(
                           hintText: "Zip/Postal Code *",
-                          myItems: const ["395006","395008","395007"],
+                          myItems: const ["382355","201301","382908","263030","382350","382481","382620","360006","382421","380013","382721","380061","382030","380005","380048","382735","380058","380019","411048","394107"],
                           selectionCallBack: (
                               String val) {
                             setState(() {
@@ -218,7 +224,7 @@ class _AddressViewState extends State<AddressView> {
                   commonBottomView(context: context,
                       child: CommonBottomStringView(
                           hintText: "Zip/Postal Code *",
-                          myItems: const ["395006","395008","395007"],
+                          myItems: const ["382355","201301","382908","263030","382350","382481","382620","360006","382421","380013","382721","380061","382030","380005","380048","382735","380058","380019","411048","394107"],
                           selectionCallBack: (
                               String val) {
                             setState(() {

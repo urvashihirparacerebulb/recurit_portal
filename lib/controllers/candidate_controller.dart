@@ -333,4 +333,166 @@ class CandidateController extends GetxController {
     );
   }
 
+  void deleteAchievement({String achievementId = ""}) {
+    apiServiceCall(
+        params: {},
+        serviceUrl: ApiConfig.deleteAchievementURL + achievementId,
+        success: (dio.Response<dynamic> response) {
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          if(experienceResponseModel.status ?? false){
+            getAchievementsInfo();
+          }
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodDELETE
+    );
+  }
+
+  void deleteSkill({String skillId = ""}) {
+    apiServiceCall(
+        params: {},
+        serviceUrl: ApiConfig.deleteSkillsURL + skillId,
+        success: (dio.Response<dynamic> response) {
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          if(experienceResponseModel.status ?? false){
+            getSkillsInfoList();
+          }
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodDELETE
+    );
+  }
+
+  void deleteFamilyInfo({String familyInfoId = ""}) {
+    apiServiceCall(
+        params: {},
+        serviceUrl: ApiConfig.deleteFamilyInfoURL + familyInfoId,
+        success: (dio.Response<dynamic> response) {
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          if(experienceResponseModel.status ?? false){
+            getFamilyDetailInfo();
+          }
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodDELETE
+    );
+  }
+
+  void deleteReference({String refId = ""}) {
+    apiServiceCall(
+        params: {},
+        serviceUrl: ApiConfig.deleteReferenceURL + refId,
+        success: (dio.Response<dynamic> response) {
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          if(experienceResponseModel.status ?? false){
+            getReferencesList();
+          }
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodDELETE
+    );
+  }
+
+  void deleteLanguage({String lanId = ""}) {
+    apiServiceCall(
+        params: {},
+        serviceUrl: ApiConfig.deleteLanguageURL + lanId,
+        success: (dio.Response<dynamic> response) {
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          if(experienceResponseModel.status ?? false){
+            getLanguagesList();
+          }
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodDELETE
+    );
+  }
+
+  void deleteQualification({String qulID = ""}) {
+    apiServiceCall(
+        params: {},
+        serviceUrl: ApiConfig.deleteQualificationURL + qulID,
+        success: (dio.Response<dynamic> response) {
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          if(experienceResponseModel.status ?? false){
+            getQualificationsList();
+          }
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodDELETE
+    );
+  }
+
+  void deleteExperience({String expId = ""}) {
+    apiServiceCall(
+        params: {},
+        serviceUrl: ApiConfig.deleteExperienceURL + expId,
+        success: (dio.Response<dynamic> response) {
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          if(experienceResponseModel.status ?? false){
+            getExperiencesList();
+          }
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodDELETE
+    );
+  }
+
+  void updateBasicInformation({String infoId = "", Function? callback,String? name,
+    dob,email,pDialCode,pCountryCode,phone,pTwoDialCode,pTwoCountryCode,phoneTwo,
+    gender,totalExpMonth,totalExpYear,status
+  }) {
+    apiServiceCall(
+        params: {
+          "name": "",
+          "date_of_birth": "",
+          "email": "",
+          "email_two": "",
+          "phone_dial_code": "",
+          "phone_country_code": "",
+          "phone": "",
+          "phone_two_dial_code": "",
+          "phone_two_country_code": "",
+          "phone_two": "",
+          "gender": "",
+          "total_experience_month": "",
+          "total_experience_year": "",
+          "status": "",
+          "manage_user_id": getLoginData()!.data?.manageUserId.toString(),
+          "updated_at": DateTime.now().toString()
+        },
+        serviceUrl: ApiConfig.updateBasicInformationURL + infoId,
+        success: (dio.Response<dynamic> response) {
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
+
 }

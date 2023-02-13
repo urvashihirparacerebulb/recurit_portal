@@ -19,6 +19,15 @@ class ApiConfig {
   static const String fetchExperienceURL = "${baseURL}fetch-experience";
 
   static const String deleteCertificateURL = "${baseURL}delete-candidate-certification/";
+  static const String deleteAchievementURL = "${baseURL}delete-candidate-achievement/";
+  static const String deleteSkillsURL = "${baseURL}delete-candidate-skills/";
+  static const String deleteFamilyInfoURL = "${baseURL}delete-candidate-family-info/";
+  static const String deleteReferenceURL = "${baseURL}delete-candidate-reference-info/";
+  static const String deleteLanguageURL = "${baseURL}delete-candidate-language-info/";
+  static const String deleteQualificationURL = "${baseURL}delete-candidate-qualification/";
+  static const String deleteExperienceURL = "${baseURL}delete-candidate-experience/";
+
+  static const String updateBasicInformationURL = "${baseURL}update-candidate-basic-info/";
 
   static const String methodPOST = "post";
   static const String methodGET = "get";

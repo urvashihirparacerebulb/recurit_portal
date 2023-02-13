@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cerebulb_recruit_portal/models/candidate_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,6 +12,7 @@ import '../controllers/candidate_controller.dart';
 import '../theme/convert_theme_colors.dart';
 import '../utility/color_utility.dart';
 import '../utility/constants.dart';
+import '../utility/delete_dialog_view.dart';
 import '../utility/screen_utility.dart';
 
 class AchievementsView extends StatefulWidget {
@@ -92,7 +94,7 @@ class _AchievementsViewState extends State<AchievementsView> {
     );
   }
 
-  void _showPopupMenu(Offset offset) async {
+  void _showPopupMenu(Offset offset,Achievement achievement) async {
     double left = offset.dx;
     double top = offset.dy;
     await showMenu(
@@ -124,7 +126,9 @@ class _AchievementsViewState extends State<AchievementsView> {
               child: InkWell(
                   onTap: (){
                     Get.back();
-                  },
+                    showDialog(context: context, builder: (BuildContext context) => DeleteDialogView(doneCallback: (){
+                      CandidateController.to.deleteAchievement(achievementId: (achievement.id ?? "").toString());
+                    }));                  },
                   child: Row(
                     children: [
                       const Icon(Icons.delete_forever_outlined),
@@ -209,7 +213,7 @@ class _AchievementsViewState extends State<AchievementsView> {
                                   alignment: Alignment.bottomRight,
                                   child: GestureDetector(
                                       onTapDown: (TapDownDetails details) {
-                                        _showPopupMenu(details.globalPosition);
+                                        _showPopupMenu(details.globalPosition, e);
                                       },
                                       child: Container(
                                           padding: const EdgeInsets.all(5.0),

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cerebulb_recruit_portal/models/candidate_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,6 +12,7 @@ import '../controllers/candidate_controller.dart';
 import '../theme/convert_theme_colors.dart';
 import '../utility/color_utility.dart';
 import '../utility/constants.dart';
+import '../utility/delete_dialog_view.dart';
 import '../utility/screen_utility.dart';
 
 class ExpierenceView extends StatefulWidget {
@@ -99,7 +101,7 @@ class _ExpierenceViewState extends State<ExpierenceView> {
     );
   }
 
-  void _showPopupMenu(Offset offset) async {
+  void _showPopupMenu(Offset offset, Experience experience) async {
     double left = offset.dx;
     double top = offset.dy;
     await showMenu(
@@ -130,7 +132,9 @@ class _ExpierenceViewState extends State<ExpierenceView> {
               value: 'Delete',
               child: InkWell(
                   onTap: (){
-                    Get.back();
+                    showDialog(context: context, builder: (BuildContext context) => DeleteDialogView(doneCallback: (){
+                      CandidateController.to.deleteExperience(expId: (experience.id ?? "").toString());
+                    }));
                   },
                   child: Row(
                     children: [
@@ -139,7 +143,8 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                       const Text('Delete'),
                     ],
                   )
-              )),
+              )
+          ),
           PopupMenuItem<String>(
               value: 'Download',
               child: InkWell(
@@ -150,10 +155,11 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                     children: [
                       const Icon(Icons.download),
                       commonHorizontalSpacing(),
-                      const Text('Download'),
+                      const Text('Download')
                     ],
                   )
-              ))
+              )
+          )
         ],
         elevation: 8.0
     );
@@ -222,7 +228,7 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                                   alignment: Alignment.bottomRight,
                                   child: GestureDetector(
                                       onTapDown: (TapDownDetails details) {
-                                        _showPopupMenu(details.globalPosition);
+                                        _showPopupMenu(details.globalPosition,e);
                                       },
                                       child: Container(
                                           padding: const EdgeInsets.all(5.0),

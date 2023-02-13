@@ -1,3 +1,4 @@
+import 'package:cerebulb_recruit_portal/models/candidate_model.dart';
 import 'package:cerebulb_recruit_portal/utility/color_utility.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,6 +8,7 @@ import '../common_widgets/common_widgets_view.dart';
 import '../controllers/candidate_controller.dart';
 import '../theme/convert_theme_colors.dart';
 import '../utility/constants.dart';
+import '../utility/delete_dialog_view.dart';
 import '../utility/screen_utility.dart';
 
 class LanguagesView extends StatefulWidget {
@@ -29,7 +31,7 @@ class _LanguagesViewState extends State<LanguagesView> {
     super.initState();
   }
 
-  void _showPopupMenu(Offset offset) async {
+  void _showPopupMenu(Offset offset,Language language) async {
     double left = offset.dx;
     double top = offset.dy;
     await showMenu(
@@ -52,7 +54,7 @@ class _LanguagesViewState extends State<LanguagesView> {
                     children: [
                       const Icon(Icons.edit),
                       commonHorizontalSpacing(),
-                      const Text('Edit'),
+                      const Text('Edit')
                     ],
                   )
               )),
@@ -60,16 +62,19 @@ class _LanguagesViewState extends State<LanguagesView> {
               value: 'Delete',
               child: InkWell(
                   onTap: (){
-                    Get.back();
+                    showDialog(context: context, builder: (BuildContext context) => DeleteDialogView(doneCallback: (){
+                      CandidateController.to.deleteLanguage(lanId: (language.id ?? "").toString());
+                    }));
                   },
                   child: Row(
                     children: [
                       const Icon(Icons.delete_forever_outlined),
                       commonHorizontalSpacing(),
-                      const Text('Delete'),
-                    ],
+                      const Text('Delete')
+                    ]
                   )
-              )),
+              )
+          )
         ],
         elevation: 8.0
     );
@@ -122,7 +127,7 @@ class _LanguagesViewState extends State<LanguagesView> {
                                   alignment: Alignment.bottomRight,
                                   child: GestureDetector(
                                       onTapDown: (TapDownDetails details) {
-                                        _showPopupMenu(details.globalPosition);
+                                        _showPopupMenu(details.globalPosition,e);
                                       },
                                       child: Container(
                                           padding: const EdgeInsets.all(5.0),

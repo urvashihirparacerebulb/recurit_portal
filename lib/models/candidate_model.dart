@@ -128,6 +128,7 @@ class CandidateDetailResponse {
 
 class CandidateDetail {
   CandidateDetail({
+    this.candidateId,
     this.name,
     this.dateOfBirth,
     this.email,
@@ -145,17 +146,23 @@ class CandidateDetail {
     this.streetLocality,
     this.landmark,
     this.stateId,
+    this.stateName,
     this.cityId,
+    this.cityName,
     this.countryId,
+    this.countryName,
     this.pincodeId,
     this.sameCorrespondenceAddress,
     this.cblockHouseNo,
     this.cstreet,
     this.clandmark,
     this.cpincode,
-    this.cstate,
-    this.ccity,
-    this.ccountry,
+    this.correspondenceStateId,
+    this.correspondenceStateName,
+    this.correspondenceCityId,
+    this.correspondenceCityName,
+    this.correspondenceCountryId,
+    this.correspondenceCountryName,
     this.currentCtc,
     this.expectedCtc,
     this.negotiable,
@@ -170,6 +177,7 @@ class CandidateDetail {
     this.status,
   });
 
+  int? candidateId;
   String? name;
   String? dateOfBirth;
   String? email;
@@ -187,17 +195,24 @@ class CandidateDetail {
   String? streetLocality;
   String? landmark;
   int? stateId;
+  String? stateName;
   int? cityId;
+  String? cityName;
   int? countryId;
+  String? countryName;
   int? pincodeId;
   int? sameCorrespondenceAddress;
   String? cblockHouseNo;
   String? cstreet;
   String? clandmark;
   int? cpincode;
-  int? cstate;
-  int? ccity;
-  int? ccountry;
+  int? correspondenceStateId;
+  String? correspondenceStateName;
+  int? correspondenceCityId;
+  String? correspondenceCityName;
+  int? correspondenceCountryId;
+  String? correspondenceCountryName;
+
   String? currentCtc;
   String? expectedCtc;
   String? negotiable;
@@ -212,6 +227,7 @@ class CandidateDetail {
   String? status;
 
   factory CandidateDetail.fromJson(Map<String, dynamic> json) => CandidateDetail(
+    candidateId: json["candidate_id"],
     name: json["name"],
     dateOfBirth: json["date_of_birth"],
     email: json["email"],
@@ -229,17 +245,23 @@ class CandidateDetail {
     streetLocality: json["street_locality"],
     landmark: json["landmark"],
     stateId: json["state_id"],
+    stateName: json["state_name"],
     cityId: json["city_id"],
+    cityName: json["city_name"],
     countryId: json["country_id"],
+    countryName: json["country_name"],
     pincodeId: json["pincode_id"],
     sameCorrespondenceAddress: json["same_correspondence_address"],
     cblockHouseNo: json["cblock_house_no"],
     cstreet: json["cstreet"],
     clandmark: json["clandmark"],
     cpincode: json["cpincode"],
-    cstate: json["cstate"],
-    ccity: json["ccity"],
-    ccountry: json["ccountry"],
+    correspondenceStateId: json["correspondence_state_id"],
+    correspondenceStateName: json["correspondence_state_name"],
+    correspondenceCityId: json["correspondence_city_id"],
+    correspondenceCityName: json["correspondence_city_name"],
+    correspondenceCountryId: json["correspondence_country_id"],
+    correspondenceCountryName: json["correspondence_country_name"],
     currentCtc: json["current_ctc"],
     expectedCtc: json["expected_ctc"],
     negotiable: json["negotiable"],
@@ -255,6 +277,7 @@ class CandidateDetail {
   );
 
   Map<String, dynamic> toJson() => {
+    "candidate_id": candidateId,
     "name": name,
     "date_of_birth": dateOfBirth,
     "email": email,
@@ -272,17 +295,23 @@ class CandidateDetail {
     "street_locality": streetLocality,
     "landmark": landmark,
     "state_id": stateId,
+    "state_name": stateName,
     "city_id": cityId,
+    "city_name": cityName,
     "country_id": countryId,
+    "country_name": countryName,
     "pincode_id": pincodeId,
     "same_correspondence_address": sameCorrespondenceAddress,
     "cblock_house_no": cblockHouseNo,
     "cstreet": cstreet,
     "clandmark": clandmark,
     "cpincode": cpincode,
-    "cstate": cstate,
-    "ccity": ccity,
-    "ccountry": ccountry,
+    "correspondence_state_id": correspondenceStateId,
+    "correspondence_state_name": correspondenceStateName,
+    "correspondence_city_id": correspondenceCityId,
+    "correspondence_city_name": correspondenceCityName,
+    "correspondence_country_id": correspondenceCountryId,
+    "correspondence_country_name": correspondenceCountryName,
     "current_ctc": currentCtc,
     "expected_ctc": expectedCtc,
     "negotiable": negotiable,
@@ -345,6 +374,7 @@ class FamilyResponse {
 class FamilyDetail {
   FamilyDetail({
     this.candidateId,
+    this.id,
     this.relativeName,
     this.relativeOccupation,
     this.relativeRelation,
@@ -355,6 +385,7 @@ class FamilyDetail {
   });
 
   int? candidateId;
+  int? id;
   String? relativeName;
   String? relativeOccupation;
   String? relativeRelation;
@@ -365,6 +396,7 @@ class FamilyDetail {
 
   factory FamilyDetail.fromJson(Map<String, dynamic> json) => FamilyDetail(
     candidateId: json["candidate_id"],
+    id: json["id"],
     relativeName: json["relative_name"],
     relativeOccupation: json["relative_occupation"],
     relativeRelation: json["relative_relation"],
@@ -376,6 +408,7 @@ class FamilyDetail {
 
   Map<String, dynamic> toJson() => {
     "candidate_id": candidateId,
+    "id": id,
     "relative_name": relativeName,
     "relative_occupation": relativeOccupation,
     "relative_relation": relativeRelation,
@@ -539,7 +572,7 @@ class Certification {
   });
 
   int? candidateId;
-  String? id;
+  int? id;
   String? certificateName;
   String? issuingOrganization;
   String? issueMonth;
@@ -629,6 +662,7 @@ class AchievementsResponse {
 class Achievement {
   Achievement({
     this.candidateId,
+    this.id,
     this.name,
     this.purpose,
     this.from,
@@ -639,6 +673,7 @@ class Achievement {
   });
 
   int? candidateId;
+  int? id;
   String? name;
   String? purpose;
   String? from;
@@ -649,6 +684,7 @@ class Achievement {
 
   factory Achievement.fromJson(Map<String, dynamic> json) => Achievement(
     candidateId: json["candidate_id"],
+    id: json["id"],
     name: json["name"],
     purpose: json["purpose"],
     from: json["from"],
@@ -660,6 +696,7 @@ class Achievement {
 
   Map<String, dynamic> toJson() => {
     "candidate_id": candidateId,
+    "id": id,
     "name": name,
     "purpose": purpose,
     "from": from,
@@ -717,6 +754,7 @@ class SkillsResponse {
 class Skills {
   Skills({
     this.candidateId,
+    this.id,
     this.skill,
     this.level,
     this.status,
@@ -724,6 +762,7 @@ class Skills {
   });
 
   int? candidateId;
+  int? id;
   String? skill;
   String? level;
   String? status;
@@ -731,6 +770,7 @@ class Skills {
 
   factory Skills.fromJson(Map<String, dynamic> json) => Skills(
     candidateId: json["candidate_id"],
+    id: json["id"],
     skill: json["skill"],
     level: json["level"],
     status: json["status"],
@@ -739,6 +779,7 @@ class Skills {
 
   Map<String, dynamic> toJson() => {
     "candidate_id": candidateId,
+    "id": id,
     "skill": skill,
     "level": level,
     "status": status,
@@ -793,6 +834,7 @@ class ReferenceResponse {
 class Reference {
   Reference({
     this.candidateId,
+    this.id,
     this.referenceName,
     this.referenceDesignation,
     this.referenceEmail,
@@ -803,6 +845,7 @@ class Reference {
   });
 
   int? candidateId;
+  int? id;
   String? referenceName;
   String? referenceDesignation;
   String? referenceEmail;
@@ -813,6 +856,7 @@ class Reference {
 
   factory Reference.fromJson(Map<String, dynamic> json) => Reference(
     candidateId: json["candidate_id"],
+    id: json["id"],
     referenceName: json["reference_name"],
     referenceDesignation: json["reference_designation"],
     referenceEmail: json["reference_email"],
@@ -824,6 +868,7 @@ class Reference {
 
   Map<String, dynamic> toJson() => {
     "candidate_id": candidateId,
+    "id": id,
     "reference_name": referenceName,
     "reference_designation": referenceDesignation,
     "reference_email": referenceEmail,
@@ -881,18 +926,21 @@ class LanguageResponse {
 class Language {
   Language({
     this.language,
+    this.id,
     this.read,
     this.write,
     this.speak,
   });
 
   String? language;
+  int? id;
   String? read;
   String? write;
   String? speak;
 
   factory Language.fromJson(Map<String, dynamic> json) => Language(
     language: json["language"],
+    id: json["id"],
     read: json["read"],
     write: json["write"],
     speak: json["speak"],
@@ -900,6 +948,7 @@ class Language {
 
   Map<String, dynamic> toJson() => {
     "language": language,
+    "id": id,
     "read": read,
     "write": write,
     "speak": speak,
@@ -953,6 +1002,7 @@ class QualificationResponse {
 class Qualification {
   Qualification({
     this.candidateId,
+    this.id,
     this.instituteName,
     this.departmentName,
     this.degreeName,
@@ -966,6 +1016,7 @@ class Qualification {
   });
 
   int? candidateId;
+  int? id;
   String? instituteName;
   String? departmentName;
   String? degreeName;
@@ -979,6 +1030,7 @@ class Qualification {
 
   factory Qualification.fromJson(Map<String, dynamic> json) => Qualification(
     candidateId: json["candidate_id"],
+    id: json["id"],
     instituteName: json["institute_name"],
     departmentName: json["department_name"],
     degreeName: json["degree_name"],
@@ -993,6 +1045,7 @@ class Qualification {
 
   Map<String, dynamic> toJson() => {
     "candidate_id": candidateId,
+    "id": id,
     "institute_name": instituteName,
     "department_name": departmentName,
     "degree_name": degreeName,
@@ -1053,6 +1106,7 @@ class ExperienceResponse {
 class Experience {
   Experience({
     this.candidateId,
+    this.id,
     this.occupationName,
     this.companyName,
     this.responsibility,
@@ -1068,6 +1122,7 @@ class Experience {
   });
 
   int? candidateId;
+  int? id;
   String? occupationName;
   String? companyName;
   String? responsibility;
@@ -1083,6 +1138,7 @@ class Experience {
 
   factory Experience.fromJson(Map<String, dynamic> json) => Experience(
     candidateId: json["candidate_id"],
+    id: json["id"],
     occupationName: json["occupation_name"],
     companyName: json["company_name"],
     responsibility: json["responsibility"],
@@ -1099,6 +1155,7 @@ class Experience {
 
   Map<String, dynamic> toJson() => {
     "candidate_id": candidateId,
+    "id": id,
     "occupation_name": occupationName,
     "company_name": companyName,
     "responsibility": responsibility,

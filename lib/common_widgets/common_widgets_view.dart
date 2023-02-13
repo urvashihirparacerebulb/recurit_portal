@@ -173,15 +173,10 @@ Widget commonBorderButtonView(
         }
       },
       style: ElevatedButton.styleFrom(
-        // shadowColor: blackColor.withOpacity(0.8),
         alignment: Alignment.center,
         primary: ConvertTheme.convertTheme.getBackGroundColor(),
-        // side: const BorderSide(
-        //   color: blackColor,
-        //   width: 1.0,
-        // ),
         shape: RoundedRectangleBorder(
-          borderRadius: commonBorderRadius,
+          borderRadius: commonBorderRadius
         ),
         padding: EdgeInsets.symmetric(vertical: height == 50.0 ? 15 : 2),
         elevation: 0.0,
@@ -195,16 +190,16 @@ Widget commonBorderButtonView(
             style: black15PxW800.copyWith(
                 color: blackColor,
                 fontWeight: FontWeight.bold,
-                fontSize: height >= 50.0 ? 16 : 12),
+                fontSize: height >= 50.0 ? 16 : 12
+            ),
           ),
           iconData != null ? commonHorizontalSpacing() : const SizedBox(),
           iconData != null
               ? Icon(
             iconData,
             size: 20,
-            color: blackColor,
-          )
-              : const SizedBox(),
+            color: blackColor)
+              : const SizedBox()
         ],
       ),
     ),
@@ -305,8 +300,8 @@ PreferredSize commonAppbar({BuildContext? context,
             onTap: (){
               Get.back();
             },
-            child: Container()),
-        // actions: [],
+            child: Container()
+        )
       );
     }),
   );
