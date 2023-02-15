@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cerebulb_recruit_portal/models/candidate_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,6 +14,7 @@ import '../theme/convert_theme_colors.dart';
 import '../utility/color_utility.dart';
 import '../utility/common_methods.dart';
 import '../utility/constants.dart';
+import '../utility/delete_dialog_view.dart';
 import '../utility/screen_utility.dart';
 
 class IdentificationView extends StatefulWidget {
@@ -30,6 +32,9 @@ class _IdentificationViewState extends State<IdentificationView> {
   String issuingDate = DateTime.now().toString();
   String expiryDate =  DateTime.now().toString();
   File? attachmentImage;
+  bool isAdd = false;
+  bool isEdit = false;
+  Identification? selectedIdentification;
 
   @override
   void initState() {
@@ -82,11 +87,13 @@ class _IdentificationViewState extends State<IdentificationView> {
                 commonHorizontalSpacing(spacing: 10),
                 Container(height: 40, width: 1, color: fontColor),
                 commonHorizontalSpacing(spacing: 10),
-                selectedFile == null ? commonHeaderTitle(
+                selectedFile == null && !isEdit ? commonHeaderTitle(
                     title: "No File Chosen",
                     color: blackColor.withOpacity(0.4),
                     isChangeColor: true
-                ) : Expanded(child: Image.file(selectedFile, height: 100))
+                ) : Expanded(child: (selectedIdentification != null && selectedFile == null) ?
+                Image.network(selectedIdentification!.attachment ?? "", height: 100) :
+                Image.file(selectedFile!, height: 100))
               ],
             ),
           ),
@@ -95,7 +102,7 @@ class _IdentificationViewState extends State<IdentificationView> {
     );
   }
 
-  void _showPopupMenu(Offset offset) async {
+  void _showPopupMenu(Offset offset,Identification identification) async {
     double left = offset.dx;
     double top = offset.dy;
     await showMenu(
@@ -112,7 +119,16 @@ class _IdentificationViewState extends State<IdentificationView> {
               value: 'Edit',
               child: InkWell(
                   onTap: (){
-                    Get.back();
+                    setState((){
+                      isAdd = true;
+                      isEdit = true;
+                      selectedIdentification = identification;
+                      idTypeController.text = identification.idType ?? "";
+                      idNoController.text = identification.idNumber ?? "";
+                      issuingAuthorityController.text = identification.issuedAuthority ?? "";
+                      issuingDate = identification.issuedDate ?? "";
+                      expiryDate = identification.expiredDate ?? "";
+                    });
                   },
                   child: Row(
                     children: [
@@ -126,7 +142,9 @@ class _IdentificationViewState extends State<IdentificationView> {
               value: 'Delete',
               child: InkWell(
                   onTap: (){
-                    Get.back();
+                    showDialog(context: context, builder: (BuildContext context) => DeleteDialogView(doneCallback: (){
+                      CandidateController.to.deleteIdentification(id: (identification.id ?? "").toString());
+                    }));
                   },
                   child: Row(
                     children: [
@@ -161,92 +179,117 @@ class _IdentificationViewState extends State<IdentificationView> {
       context: context,
       child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
+          child: ListView(
+            shrinkWrap: true,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   commonHeaderTitle(title: "Identification", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 4),
-                  commonFillButtonView(
+                  isAdd ? commonFillButtonView(
+                      context: context,
+                      title: "SAVE",
+                      width: 70,
+                      height: 35,
+                      tapOnButton: () {
+                          CandidateController.to.addEditIdentificationView(
+                              idType: idTypeController.text,
+                              idNumber: idNoController.text,
+                              issuedAuthority: issuingAuthorityController.text,
+                              issuedDate: DateFormat("yyyy-MM-dd").format(DateTime.parse(issuingDate)),
+                              expiryDate: DateFormat("yyyy-MM-dd").format(DateTime.parse(expiryDate)),
+                              attachment: attachmentImage,
+                              isEdit: isEdit,
+                              indentificationId: selectedIdentification != null ? selectedIdentification!.id.toString() : "",
+                              status: selectedIdentification != null ? selectedIdentification!.status : "Active",
+                              callback: (){
+                                CandidateController.to.getIdentificationInfoList();
+                                isAdd = false;
+                                isEdit = false;
+                              }
+                          );
+                      },
+                      isLoading: false) : commonFillButtonView(
                       context: context,
                       title: "ADD",
                       width: 70,
                       height: 35,
                       tapOnButton: () {
-
+                        setState(() {
+                          isAdd = true;
+                        });
                       },
                       isLoading: false)
                 ],
               ),
               commonVerticalSpacing(),
-              Obx(() => CandidateController.to.identificationList.isNotEmpty ? SizedBox(
-                height: getScreenHeight(context) - 157,
-                child: ListView(
-                    shrinkWrap: true,
-                    children: CandidateController.to.identificationList.map((e) => Container(
-                      padding: const EdgeInsets.all(12),
-                      margin: const EdgeInsets.only(bottom: 20),
-                      decoration: neurmorphicBoxDecoration,
-                      child: Row(
-                        children: [
-                          Container(
-                            height: 100,
-                            width: 100,
-                            color: Colors.grey,
+              Obx(() => !isAdd ? ListView(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: CandidateController.to.identificationList.map((e) => Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: neurmorphicBoxDecoration,
+                    child: Row(
+                      children: [
+                        Container(
+                          height: 100,
+                          width: 100,
+                          color: Colors.grey,
+                        ),
+                        commonHorizontalSpacing(),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  commonHeaderTitle(title: e.idType ?? "", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 3),
+                                  commonHeaderTitle(title: e.idNumber ?? "", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 3),
+                                ],
+                              ),
+                              commonVerticalSpacing(),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  commonHeaderTitle(title: e.issuedDate ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                                  commonHeaderTitle(title: e.expiredDate ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                                ],
+                              ),
+                              commonVerticalSpacing(),
+                              Row(
+                                children: [
+                                  commonHeaderTitle(title: e.issuedAuthority ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                                  Expanded(flex: 2,child: Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: GestureDetector(
+                                          onTapDown: (TapDownDetails details) {
+                                            _showPopupMenu(details.globalPosition,e);
+                                          },
+                                          child: Container(
+                                              padding: const EdgeInsets.all(5.0),
+                                              decoration: const BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: Color(0xffD9D9D9)
+                                              ),
+                                              child: Icon(Icons.more_vert_rounded,size: isTablet() ? 28 : 20)
+                                          )
+                                      )
+                                  ))
+                                ],
+                              )
+                            ],
                           ),
-                          commonHorizontalSpacing(),
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    commonHeaderTitle(title: e.idType ?? "", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 3),
-                                    commonHeaderTitle(title: e.idNumber ?? "", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 3),
-                                  ],
-                                ),
-                                commonVerticalSpacing(),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    commonHeaderTitle(title: e.issuedDate ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                                    commonHeaderTitle(title: e.expiredDate ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                                  ],
-                                ),
-                                commonVerticalSpacing(),
-                                Row(
-                                  children: [
-                                    commonHeaderTitle(title: e.issuedAuthority ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                                    Expanded(flex: 2,child: Align(
-                                        alignment: Alignment.bottomRight,
-                                        child: GestureDetector(
-                                            onTapDown: (TapDownDetails details) {
-                                              _showPopupMenu(details.globalPosition);
-                                            },
-                                            child: Container(
-                                                padding: const EdgeInsets.all(5.0),
-                                                decoration: const BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: Color(0xffD9D9D9)
-                                                ),
-                                                child: Icon(Icons.more_vert_rounded,size: isTablet() ? 28 : 20)
-                                            )
-                                        )
-                                    ))
-                                  ],
-                                )
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    )).toList()
-                ),
+                        )
+                      ],
+                    ),
+                  )).toList()
               ) : ListView(
                 shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
                 children: [
                   CommonTextFiled(
                       fieldTitleText: "ID Type *",

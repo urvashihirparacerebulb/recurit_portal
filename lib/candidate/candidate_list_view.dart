@@ -81,11 +81,11 @@ class _CandidateListViewState extends State<CandidateListView> {
                         commonHeaderTitle(
                           title: (CandidateController.to.candidateList[index].status ?? "").toUpperCase(),
                           fontWeight: 2,
-                          fontSize: 1.2
+                          fontSize: 1
                         )
-                      ],
-                    ),
-                  ],
+                      ]
+                    )
+                  ]
                 ),
               ),
             );

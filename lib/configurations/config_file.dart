@@ -23,11 +23,27 @@ class ApiConfig {
   static const String deleteSkillsURL = "${baseURL}delete-candidate-skills/";
   static const String deleteFamilyInfoURL = "${baseURL}delete-candidate-family-info/";
   static const String deleteReferenceURL = "${baseURL}delete-candidate-reference-info/";
+  static const String deleteIdentificationURL = "${baseURL}delete-candidate-identification/";
   static const String deleteLanguageURL = "${baseURL}delete-candidate-language-info/";
   static const String deleteQualificationURL = "${baseURL}delete-candidate-qualification/";
   static const String deleteExperienceURL = "${baseURL}delete-candidate-experience/";
 
   static const String updateBasicInformationURL = "${baseURL}update-candidate-basic-info/";
+  static const String updateAddressURL = "${baseURL}update-candidate-address-info/";
+  static const String updateCompensationURL = "${baseURL}update-candidate-compensation-info/";
+  static const String updateQuestionaryURL = "${baseURL}update-candidate-questionary-info/";
+  static const String updateIndustryInfoURL = "${baseURL}update-candidate-industry-info/";
+  static const String updateIndentificationURL = "${baseURL}update-candidate-identification/";
+  static const String updateCertificationURL = "${baseURL}update-candidate-certification/";
+  static const String updateAchievementURL = "${baseURL}update-candidate-achievement/";
+  static const String updateSkillURL = "${baseURL}update-candidate-skills/";
+  static const String updateFamilyInfoURL = "${baseURL}update-candidate-family-info/";
+
+  static const String addIdentificationURL = "${baseURL}add-candidate-identification";
+  static const String addCertificationURL = "${baseURL}add-candidate-certification";
+  static const String addAchievementURL = "${baseURL}add-candidate-achievement";
+  static const String addSkillURL = "${baseURL}add-candidate-skills";
+  static const String addFamilyInfoURL = "${baseURL}add-candidate-family-info";
 
   static const String methodPOST = "post";
   static const String methodGET = "get";

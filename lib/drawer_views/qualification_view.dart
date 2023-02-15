@@ -186,60 +186,57 @@ class _QualificationViewState extends State<QualificationView> {
                 ],
               ),
               commonVerticalSpacing(),
-              Obx(() => CandidateController.to.qualificationsList.isNotEmpty ? SizedBox(
-                height: getScreenHeight(context) - 157,
-                child: ListView(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: CandidateController.to.qualificationsList.map((e) => Container(
-                      padding: const EdgeInsets.all(12),
-                      margin: const EdgeInsets.only(bottom: 20),
-                      decoration: neurmorphicBoxDecoration,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          commonHeaderTitle(title: e.instituteName ?? "", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 2),
-                          commonVerticalSpacing(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              commonHeaderTitle(title: e.departmentName ?? "", fontSize: isTablet() ? 1.3 : 1.1, fontWeight: 1),
-                              commonHeaderTitle(title: e.degreeName ?? "", fontSize: isTablet() ? 1.3 : 1.1, fontWeight: 1),
-                            ],
-                          ),
-                          commonVerticalSpacing(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  commonHeaderTitle(title: e.fromMonth ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                                  commonHeaderTitle(title: e.toMonth ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1)
-                                ],
-                              ),
-                              Expanded(flex: 2,child: Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: GestureDetector(
-                                      onTapDown: (TapDownDetails details) {
-                                        _showPopupMenu(details.globalPosition, e);
-                                      },
-                                      child: Container(
-                                          padding: const EdgeInsets.all(5.0),
-                                          decoration: const BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Color(0xffD9D9D9)
-                                          ),
-                                          child: Icon(Icons.more_vert_rounded,size: isTablet() ? 28 : 20))
-                                  )
-                              ))
-                            ],
-                          )
-                        ],
-                      ),
-                    )).toList()
-                ),
+              Obx(() => CandidateController.to.qualificationsList.isNotEmpty ? ListView(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: CandidateController.to.qualificationsList.map((e) => Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: neurmorphicBoxDecoration,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        commonHeaderTitle(title: e.instituteName ?? "", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 2),
+                        commonVerticalSpacing(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            commonHeaderTitle(title: e.departmentName ?? "", fontSize: isTablet() ? 1.3 : 1.1, fontWeight: 1),
+                            commonHeaderTitle(title: e.degreeName ?? "", fontSize: isTablet() ? 1.3 : 1.1, fontWeight: 1),
+                          ],
+                        ),
+                        commonVerticalSpacing(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                commonHeaderTitle(title: e.fromMonth ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                                commonHeaderTitle(title: e.toMonth ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1)
+                              ],
+                            ),
+                            Expanded(flex: 2,child: Align(
+                                alignment: Alignment.bottomRight,
+                                child: GestureDetector(
+                                    onTapDown: (TapDownDetails details) {
+                                      _showPopupMenu(details.globalPosition, e);
+                                    },
+                                    child: Container(
+                                        padding: const EdgeInsets.all(5.0),
+                                        decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Color(0xffD9D9D9)
+                                        ),
+                                        child: Icon(Icons.more_vert_rounded,size: isTablet() ? 28 : 20))
+                                )
+                            ))
+                          ],
+                        )
+                      ],
+                    ),
+                  )).toList()
               ) : ListView(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),

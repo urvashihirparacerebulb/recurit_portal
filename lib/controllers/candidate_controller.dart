@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:cerebulb_recruit_portal/models/boolean_response_model.dart';
 import 'package:cerebulb_recruit_portal/utility/common_methods.dart';
 import 'package:get/get.dart';
 
+import '../common_widgets/common_methods.dart';
 import '../configurations/api_service.dart';
 import '../configurations/config_file.dart';
 import 'package:dio/dio.dart' as dio;
@@ -459,30 +461,288 @@ class CandidateController extends GetxController {
     );
   }
 
+  void  deleteIdentification({String id = ""}) {
+    apiServiceCall(
+        params: {},
+        serviceUrl: ApiConfig.deleteIdentificationURL + id,
+        success: (dio.Response<dynamic> response) {
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          if(experienceResponseModel.status ?? false){
+            getIdentificationInfoList();
+          }
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodDELETE
+    );
+  }
+
   void updateBasicInformation({String infoId = "", Function? callback,String? name,
-    dob,email,pDialCode,pCountryCode,phone,pTwoDialCode,pTwoCountryCode,phoneTwo,
+    dob,email,emailTwo,pDialCode,pCountryCode,phone,pTwoDialCode,pTwoCountryCode,phoneTwo,
     gender,totalExpMonth,totalExpYear,status
   }) {
     apiServiceCall(
         params: {
-          "name": "",
-          "date_of_birth": "",
-          "email": "",
-          "email_two": "",
-          "phone_dial_code": "",
-          "phone_country_code": "",
-          "phone": "",
-          "phone_two_dial_code": "",
-          "phone_two_country_code": "",
-          "phone_two": "",
-          "gender": "",
-          "total_experience_month": "",
-          "total_experience_year": "",
-          "status": "",
+          "name": name,
+          "date_of_birth": dob,
+          "email": email,
+          "email_two": emailTwo,
+          "phone_dial_code": pDialCode,
+          "phone_country_code": pCountryCode,
+          "phone": phone,
+          "phone_two_dial_code": pTwoDialCode,
+          "phone_two_country_code": pTwoCountryCode,
+          "phone_two": phoneTwo,
+          "gender": gender,
+          "total_experience_month": totalExpMonth,
+          "total_experience_year": totalExpYear,
+          "status": status,
           "manage_user_id": getLoginData()!.data?.manageUserId.toString(),
           "updated_at": DateTime.now().toString()
         },
         serviceUrl: ApiConfig.updateBasicInformationURL + infoId,
+        success: (dio.Response<dynamic> response) {
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          showSnackBar(title: ApiConfig.success, message: experienceResponseModel.message ?? "");
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
+  void updateAddressView({String infoId = "", Function? callback,String? name,
+    dob,email,emailTwo,pDialCode,pCountryCode,phone,pTwoDialCode,pTwoCountryCode,phoneTwo,
+    gender,totalExpMonth,totalExpYear,status
+  }) {
+    apiServiceCall(
+        params: {
+          "name": name,
+          "date_of_birth": dob,
+          "email": email,
+          "email_two": emailTwo,
+          "phone_dial_code": pDialCode,
+          "phone_country_code": pCountryCode,
+          "phone": phone,
+          "phone_two_dial_code": pTwoDialCode,
+          "phone_two_country_code": pTwoCountryCode,
+          "phone_two": phoneTwo,
+          "gender": gender,
+          "total_experience_month": totalExpMonth,
+          "total_experience_year": totalExpYear,
+          "status": status,
+          "manage_user_id": getLoginData()!.data?.manageUserId.toString(),
+          "updated_at": DateTime.now().toString()
+        },
+        serviceUrl: ApiConfig.updateAddressURL + infoId,
+        success: (dio.Response<dynamic> response) {
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          showSnackBar(title: ApiConfig.success, message: experienceResponseModel.message ?? "");
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
+  void updateCompensationView({String currentCTC = "",expectedCTC, status,bool isNegotiable = false, Function? callback}) {
+    apiServiceCall(
+        params: {
+          "current_ctc": currentCTC,
+          "expected_ctc": expectedCTC,
+          "negotiable": isNegotiable ? "yes" : "no",
+          "status": status,
+          "manage_user_id": getLoginData()!.data?.manageUserId,
+          "updated_at": DateTime.now().toString()
+        },
+        serviceUrl: ApiConfig.updateCompensationURL + candidateId.value,
+        success: (dio.Response<dynamic> response) {
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          showSnackBar(title: ApiConfig.success, message: experienceResponseModel.message ?? "");
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
+  void updateQuestionaryView({String months = "",years, status,
+    noticePeriod,bool relocateStatus = false,bool wfh = false,bool bondStatus = false,
+    Function? callback}) {
+    apiServiceCall(
+        params: {
+          "notice_period": noticePeriod,
+          "bond_months": months,
+          "bond_years": years,
+          "relocate_status": relocateStatus ? "yes" : "no",
+          "work_from_home": wfh ? "yes" : "no",
+          "bond_status": bondStatus ? "yes" : "no",
+          "status": status,
+          "manage_user_id": getLoginData()!.data?.manageUserId,
+          "updated_at": DateTime.now().toString()
+        },
+        serviceUrl: ApiConfig.updateQuestionaryURL + candidateId.value,
+        success: (dio.Response<dynamic> response) {
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          showSnackBar(title: ApiConfig.success, message: experienceResponseModel.message ?? "");
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
+  void updateIndustryView({String industryName = "",expertise, status,Function? callback}) {
+    apiServiceCall(
+        params: {
+          "industry_name": industryName,
+          "expertise": expertise,
+          "status": status,
+          "manage_user_id": getLoginData()!.data?.manageUserId,
+          "updated_at": DateTime.now().toString()
+        },
+        serviceUrl: ApiConfig.updateIndustryInfoURL + candidateId.value,
+        success: (dio.Response<dynamic> response) {
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          showSnackBar(title: ApiConfig.success, message: experienceResponseModel.message ?? "");
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
+  Future<void> addEditIdentificationView({String idType = "",idNumber, issuedAuthority, issuedDate, expiryDate, status,
+      bool isEdit = false,
+      String indentificationId = "",
+      File? attachment,
+      Function? callback}) async {
+      dio.FormData formData = dio.FormData.fromMap({
+        "candidate_id": candidateId.value,
+        "id_type": idType,
+        "id_number": idNumber,
+        "issued_authority": issuedAuthority,
+        "issued_date": issuedDate,
+        "expired_date": expiryDate,
+        "status": status,
+        "manage_user_id": getLoginData()!.data?.manageUserId,
+        "updated_at": DateTime.now().toString()
+      });
+
+      if(!isEdit){
+        formData.fields.add(MapEntry("created_at", DateTime.now().toString()));
+      }
+
+      if(attachment != null){
+        formData.files.add(
+            MapEntry("attachment", await dio
+                    .MultipartFile.fromFile(attachment.path)),);
+      }
+      apiServiceCall(
+        params: {},
+        formValues: formData,
+        serviceUrl: isEdit ? (ApiConfig.updateIndentificationURL + indentificationId) : ApiConfig.addIdentificationURL,
+        success: (dio.Response<dynamic> response) {
+          // BooleanResponseModel booleanResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
+  Future<void> addEditCertificationView({String certificateName = "",issuingOrg, issueMonth, expireMonth, credId, credURL, status,
+    bool isEdit = false,
+    String certificationId = "",
+    File? attachment,
+    Function? callback}) async {
+    dio.FormData formData = dio.FormData.fromMap({
+      "candidate_id": candidateId.value,
+      "certificate_name": certificateName,
+      "issuing_organization": issuingOrg,
+      "issue_month": issueMonth,
+      "expire_month": expireMonth,
+      "credential_id": credId,
+      "credential_url": credURL,
+      "status": status,
+      "manage_user_id": getLoginData()!.data?.manageUserId,
+      "updated_at": DateTime.now().toString()
+    });
+
+    if(!isEdit){
+      formData.fields.add(MapEntry("created_at", DateTime.now().toString()));
+    }
+
+    if(attachment != null){
+      formData.files.add(
+        MapEntry("attachment", await dio
+            .MultipartFile.fromFile(attachment.path)),);
+    }
+    apiServiceCall(
+        params: {},
+        formValues: formData,
+        serviceUrl: isEdit ? (ApiConfig.updateCertificationURL + certificationId) : ApiConfig.addCertificationURL,
+        success: (dio.Response<dynamic> response) {
+          // BooleanResponseModel booleanResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
+  Future<void> addEditAchievementView({String name = "",purpose, from, remark, status,
+    bool isEdit = false,
+    String achievementId = "",
+    File? attachment,
+    Function? callback}) async {
+    dio.FormData formData = dio.FormData.fromMap({
+      "candidate_id": candidateId.value,
+      "name": name,
+      "purpose": purpose,
+      "from": from,
+      "remark": remark,
+      "status": status,
+      "manage_user_id": getLoginData()!.data?.manageUserId,
+      "updated_at": DateTime.now().toString()
+    });
+
+    if(!isEdit){
+      formData.fields.add(MapEntry("created_at", DateTime.now().toString()));
+    }
+
+    if(attachment != null){
+      formData.files.add(
+        MapEntry("attachment", await dio
+            .MultipartFile.fromFile(attachment.path)));
+    }
+    apiServiceCall(
+        params: {},
+        formValues: formData,
+        serviceUrl: isEdit ? (ApiConfig.updateAchievementURL + achievementId) : ApiConfig.addAchievementURL,
         success: (dio.Response<dynamic> response) {
           callback!();
         },
@@ -494,5 +754,68 @@ class CandidateController extends GetxController {
     );
   }
 
+  Future<void> addEditSkillsView({String skill = "",level, status,
+    Function? callback}) async {
+    dio.FormData formData = dio.FormData.fromMap({
+      "candidate_id": candidateId.value,
+      "skill": skill,
+      "level": level,
+      "status": status,
+      "manage_user_id": getLoginData()!.data?.manageUserId,
+      "created_at": DateTime.now().toString(),
+      "updated_at": DateTime.now().toString()
+    });
+
+    apiServiceCall(
+        params: {},
+        formValues: formData,
+        serviceUrl: ApiConfig.addSkillURL,
+        success: (dio.Response<dynamic> response) {
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
+  Future<void> addEditFamilyDetailView({String name = "",occupation, relation, phone, email, status, countryCode, dialCode,
+    bool isEdit = false,
+    String relativeId = "",
+    Function? callback}) async {
+    dio.FormData formData = dio.FormData.fromMap({
+      "candidate_id": candidateId.value,
+      "relative_name": name,
+      "relative_occupation": occupation,
+      "relative_relation": relation,
+      "relative_phone": phone,
+      "relative_email": email,
+      "relative_phone_dial_code": dialCode,
+      "relative_phone_country_code": countryCode,
+      "status": status,
+      "manage_user_id": getLoginData()!.data?.manageUserId,
+      "updated_at": DateTime.now().toString()
+    });
+
+    if(!isEdit){
+      formData.fields.add(MapEntry("created_at", DateTime.now().toString()));
+    }
+
+    apiServiceCall(
+        params: {},
+        formValues: formData,
+        serviceUrl: isEdit ? (ApiConfig.updateFamilyInfoURL + relativeId) : ApiConfig.addFamilyInfoURL,
+        success: (dio.Response<dynamic> response) {
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
 
 }

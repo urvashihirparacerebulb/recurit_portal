@@ -105,80 +105,77 @@ class _LanguagesViewState extends State<LanguagesView> {
                 ],
               ),
               commonVerticalSpacing(),
-              Obx(() => CandidateController.to.languagesList.isNotEmpty ? SizedBox(
-                height: getScreenHeight(context) - 157,
-                child: ListView(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: CandidateController.to.languagesList.map((e) => Container(
-                      padding: const EdgeInsets.all(12),
-                      margin: const EdgeInsets.only(bottom: 20),
-                      decoration: neurmorphicBoxDecoration,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              commonHeaderTitle(title: e.language ?? "", fontSize: isTablet() ? 1.3 : 1.1, fontWeight: 2),
-                              Expanded(flex: 2,child: Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: GestureDetector(
-                                      onTapDown: (TapDownDetails details) {
-                                        _showPopupMenu(details.globalPosition,e);
-                                      },
-                                      child: Container(
-                                          padding: const EdgeInsets.all(5.0),
-                                          decoration: const BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Color(0xffD9D9D9)
-                                          ),
-                                          child: Icon(Icons.more_vert_rounded,size: isTablet() ? 28 : 20))
-                                  )
-                              ))
-                            ],
-                          ),
-                          commonVerticalSpacing(spacing: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  commonHeaderTitle(title: "READ", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                                  commonVerticalSpacing(),
-                                  e.read != null && (e.read == "Yes") ? const Icon(Icons.check_circle_outline,color: greenColor) :
-                                  const Icon(Icons.close,color: dangerColor)
-                                ],
-                              )),
+              Obx(() => CandidateController.to.languagesList.isNotEmpty ? ListView(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: CandidateController.to.languagesList.map((e) => Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: neurmorphicBoxDecoration,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            commonHeaderTitle(title: e.language ?? "", fontSize: isTablet() ? 1.3 : 1.1, fontWeight: 2),
+                            Expanded(flex: 2,child: Align(
+                                alignment: Alignment.bottomRight,
+                                child: GestureDetector(
+                                    onTapDown: (TapDownDetails details) {
+                                      _showPopupMenu(details.globalPosition,e);
+                                    },
+                                    child: Container(
+                                        padding: const EdgeInsets.all(5.0),
+                                        decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Color(0xffD9D9D9)
+                                        ),
+                                        child: Icon(Icons.more_vert_rounded,size: isTablet() ? 28 : 20))
+                                )
+                            ))
+                          ],
+                        ),
+                        commonVerticalSpacing(spacing: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                commonHeaderTitle(title: "READ", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                                commonVerticalSpacing(),
+                                e.read != null && (e.read == "Yes") ? const Icon(Icons.check_circle_outline,color: greenColor) :
+                                const Icon(Icons.close,color: dangerColor)
+                              ],
+                            )),
 
-                              Expanded(child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  commonHeaderTitle(title: "WRITE", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                                  commonVerticalSpacing(),
-                                  e.write != null && (e.write == "Yes") ? const Icon(Icons.check_circle_outline,color: greenColor) :
-                                  const Icon(Icons.close,color: dangerColor)
-                                ],
-                              )),
+                            Expanded(child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                commonHeaderTitle(title: "WRITE", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                                commonVerticalSpacing(),
+                                e.write != null && (e.write == "Yes") ? const Icon(Icons.check_circle_outline,color: greenColor) :
+                                const Icon(Icons.close,color: dangerColor)
+                              ],
+                            )),
 
-                              Expanded(child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  commonHeaderTitle(title: "SPEAK", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                                  commonVerticalSpacing(),
-                                  e.speak != null && (e.speak == "Yes") ? const Icon(Icons.check_circle_outline,color: greenColor) :
-                                  const Icon(Icons.close,color: dangerColor)
-                                ],
-                              ))
-                            ],
-                          )
-                        ],
-                      ),
-                    )).toList()
-                ),
+                            Expanded(child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                commonHeaderTitle(title: "SPEAK", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                                commonVerticalSpacing(),
+                                e.speak != null && (e.speak == "Yes") ? const Icon(Icons.check_circle_outline,color: greenColor) :
+                                const Icon(Icons.close,color: dangerColor)
+                              ],
+                            ))
+                          ],
+                        )
+                      ],
+                    ),
+                  )).toList()
               ) : ListView(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),

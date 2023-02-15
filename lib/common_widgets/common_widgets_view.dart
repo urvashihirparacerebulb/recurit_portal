@@ -267,13 +267,14 @@ commonDecoratedTextView({String title = "", bool isChangeColor = false,double bo
   );
 }
 
-Widget commonCheckBoxTile({Function? callback,bool isSelected = false, String title = ""}){
+Widget commonCheckBoxTile({Function? callback,bool isSelected = false, String title = "",bool enable = true}){
   return CheckboxListTile(
     controlAffinity: ListTileControlAffinity.leading,
     visualDensity: VisualDensity.comfortable,
     title: Text(title),
     value: isSelected,
     activeColor: greenColor,
+    enabled: enable,
     onChanged: (bool? value) {
       callback!(value);
     },

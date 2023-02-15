@@ -33,6 +33,7 @@ class _AddressViewState extends State<AddressView> {
   TextEditingController correspondenceStateController = TextEditingController();
   TextEditingController correspondenceCountryController = TextEditingController();
   String correspondenceSelectedZipcode = "";
+  bool isEdit = false;
 
   @override
   void initState() {
@@ -69,12 +70,29 @@ class _AddressViewState extends State<AddressView> {
           child: ListView(
             shrinkWrap: true,
             children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  commonHeaderTitle(title: "Basic Details", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 4),
+                  commonFillButtonView(
+                      context: context,
+                      title: "EDIT",
+                      width: 70, height: 35,
+                      tapOnButton: () {
+                        setState(() {
+                          isEdit = true;
+                        });
+                      }, isLoading: false
+                  )
+                ],
+              ),
+              commonVerticalSpacing(),
               commonHeaderTitle(title: "Permanent Address", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 4),
               commonVerticalSpacing(),
               CommonTextFiled(
                   fieldTitleText: "Block / House No. *",
                   hintText: "Block / House No. *",
-                  // isBorderEnable: false,
+                  isEnabled: isEdit,
                   textEditingController: houseNumController,
                   onChangedFunction: (String value){
                   },
@@ -87,7 +105,7 @@ class _AddressViewState extends State<AddressView> {
               CommonTextFiled(
                   fieldTitleText: "Street/ Locality *",
                   hintText: "Street/ Locality *",
-                  // isBorderEnable: false,
+                  isEnabled: isEdit,
                   textEditingController: streetLocalityController,
                   onChangedFunction: (String value){
                   },
@@ -100,7 +118,7 @@ class _AddressViewState extends State<AddressView> {
               CommonTextFiled(
                   fieldTitleText: "Landmark *",
                   hintText: "Landmark *",
-                  // isBorderEnable: false,
+                  isEnabled: isEdit,
                   textEditingController: landmarkController,
                   onChangedFunction: (String value){
                   },
@@ -112,16 +130,38 @@ class _AddressViewState extends State<AddressView> {
               commonVerticalSpacing(),
               InkWell(
                 onTap: (){
-                  commonBottomView(context: context,
-                      child: CommonBottomStringView(
-                          hintText: "Zip/Postal Code *",
-                          myItems: const ["382355","201301","382908","263030","382350","382481","382620","360006","382421","380013","382721","380061","382030","380005","380048","382735","380058","380019","411048","394107"],
-                          selectionCallBack: (
-                              String val) {
-                            setState(() {
-                              selectedZipcode = val;
-                            });
-                          }));
+                  if(isEdit) {
+                    commonBottomView(context: context,
+                        child: CommonBottomStringView(
+                            hintText: "Zip/Postal Code *",
+                            myItems: const [
+                              "382355",
+                              "201301",
+                              "382908",
+                              "263030",
+                              "382350",
+                              "382481",
+                              "382620",
+                              "360006",
+                              "382421",
+                              "380013",
+                              "382721",
+                              "380061",
+                              "382030",
+                              "380005",
+                              "380048",
+                              "382735",
+                              "380058",
+                              "380019",
+                              "411048",
+                              "394107"
+                            ],
+                            selectionCallBack: (String val) {
+                              setState(() {
+                                selectedZipcode = val;
+                              });
+                            }));
+                  }
                 },
                 child: commonDecoratedTextView(
                     bottom: 10,
@@ -133,7 +173,7 @@ class _AddressViewState extends State<AddressView> {
               CommonTextFiled(
                   fieldTitleText: "City",
                   hintText: "City",
-                  // isBorderEnable: false,
+                  isEnabled: isEdit,
                   textEditingController: cityController,
                   onChangedFunction: (String value){
                   },
@@ -147,7 +187,7 @@ class _AddressViewState extends State<AddressView> {
               CommonTextFiled(
                   fieldTitleText: "State/Province",
                   hintText: "State/Province",
-                  // isBorderEnable: false,
+                  isEnabled: isEdit,
                   textEditingController: stateController,
                   onChangedFunction: (String value){
                   },
@@ -161,7 +201,7 @@ class _AddressViewState extends State<AddressView> {
               CommonTextFiled(
                   fieldTitleText: "Country",
                   hintText: "Country",
-                  // isBorderEnable: false,
+                  isEnabled: isEdit,
                   textEditingController: countryController,
                   onChangedFunction: (String value){
                   },
@@ -183,7 +223,7 @@ class _AddressViewState extends State<AddressView> {
               CommonTextFiled(
                   fieldTitleText: "Block / House No. *",
                   hintText: "Block / House No. *",
-                  // isBorderEnable: false,
+                  isEnabled: isEdit,
                   textEditingController: correspondenceHouseNumController,
                   onChangedFunction: (String value){
                   },
@@ -196,7 +236,7 @@ class _AddressViewState extends State<AddressView> {
               CommonTextFiled(
                   fieldTitleText: "Street/ Locality *",
                   hintText: "Street/ Locality *",
-                  // isBorderEnable: false,
+                  isEnabled: isEdit,
                   textEditingController: correspondenceStreetLocalityController,
                   onChangedFunction: (String value){
                   },
@@ -209,7 +249,7 @@ class _AddressViewState extends State<AddressView> {
               CommonTextFiled(
                   fieldTitleText: "Landmark *",
                   hintText: "Landmark *",
-                  // isBorderEnable: false,
+                  isEnabled: isEdit,
                   textEditingController: correspondenceLandmarkController,
                   onChangedFunction: (String value){
                   },
@@ -221,16 +261,38 @@ class _AddressViewState extends State<AddressView> {
               commonVerticalSpacing(),
               InkWell(
                 onTap: (){
-                  commonBottomView(context: context,
-                      child: CommonBottomStringView(
-                          hintText: "Zip/Postal Code *",
-                          myItems: const ["382355","201301","382908","263030","382350","382481","382620","360006","382421","380013","382721","380061","382030","380005","380048","382735","380058","380019","411048","394107"],
-                          selectionCallBack: (
-                              String val) {
-                            setState(() {
-                              correspondenceSelectedZipcode = val;
-                            });
-                          }));
+                  if(isEdit) {
+                    commonBottomView(context: context,
+                        child: CommonBottomStringView(
+                            hintText: "Zip/Postal Code *",
+                            myItems: const [
+                              "382355",
+                              "201301",
+                              "382908",
+                              "263030",
+                              "382350",
+                              "382481",
+                              "382620",
+                              "360006",
+                              "382421",
+                              "380013",
+                              "382721",
+                              "380061",
+                              "382030",
+                              "380005",
+                              "380048",
+                              "382735",
+                              "380058",
+                              "380019",
+                              "411048",
+                              "394107"
+                            ],
+                            selectionCallBack: (String val) {
+                              setState(() {
+                                correspondenceSelectedZipcode = val;
+                              });
+                            }));
+                  }
                 },
                 child: commonDecoratedTextView(
                     bottom: 10,
@@ -241,7 +303,7 @@ class _AddressViewState extends State<AddressView> {
               CommonTextFiled(
                   fieldTitleText: "City",
                   hintText: "City",
-                  // isBorderEnable: false,
+                  isEnabled: isEdit,
                   textEditingController: correspondenceCityController,
                   onChangedFunction: (String value){
                   },
@@ -255,7 +317,7 @@ class _AddressViewState extends State<AddressView> {
               CommonTextFiled(
                   fieldTitleText: "State/Province",
                   hintText: "State/Province",
-                  // isBorderEnable: false,
+                  isEnabled: isEdit,
                   textEditingController: correspondenceStateController,
                   onChangedFunction: (String value){
                   },
@@ -269,7 +331,7 @@ class _AddressViewState extends State<AddressView> {
               CommonTextFiled(
                   fieldTitleText: "Country",
                   hintText: "Country",
-                  // isBorderEnable: false,
+                  isEnabled: isEdit,
                   textEditingController: correspondenceCountryController,
                   onChangedFunction: (String value){
                   },
@@ -278,8 +340,6 @@ class _AddressViewState extends State<AddressView> {
                         ? notEmptyFieldMessage
                         : null;
                   }),
-
-
             ],
           ),
         )

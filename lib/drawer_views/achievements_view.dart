@@ -29,6 +29,9 @@ class _AchievementsViewState extends State<AchievementsView> {
   TextEditingController orgFromController = TextEditingController();
   TextEditingController remarksController = TextEditingController();
   File? attachmentImage;
+  bool isAdd = false;
+  bool isEdit = false;
+  Achievement? selectedAchievement;
 
   @override
   void initState() {
@@ -81,11 +84,13 @@ class _AchievementsViewState extends State<AchievementsView> {
                 commonHorizontalSpacing(spacing: 10),
                 Container(height: 40, width: 1, color: fontColor),
                 commonHorizontalSpacing(spacing: 10),
-                selectedFile == null ? commonHeaderTitle(
+                selectedFile == null && !isEdit ? commonHeaderTitle(
                     title: "No File Chosen",
                     color: blackColor.withOpacity(0.4),
                     isChangeColor: true
-                ) : Expanded(child: Image.file(selectedFile, height: 100))
+                ) : Expanded(child: (selectedAchievement != null && selectedFile == null) ?
+                Image.network(selectedAchievement!.attachment ?? "", height: 100) :
+                Image.file(selectedFile!, height: 100))
               ],
             ),
           ),
@@ -111,7 +116,15 @@ class _AchievementsViewState extends State<AchievementsView> {
               value: 'Edit',
               child: InkWell(
                   onTap: (){
-                    Get.back();
+                    setState((){
+                      isAdd = true;
+                      isEdit = true;
+                      selectedAchievement = achievement;
+                      awardNameController.text = achievement.name ?? "";
+                      purposeController.text = achievement.purpose ?? "";
+                      orgFromController.text = achievement.from ?? "";
+                      remarksController.text = achievement.remark ?? "";
+                    });
                   },
                   child: Row(
                     children: [
@@ -169,68 +182,89 @@ class _AchievementsViewState extends State<AchievementsView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   commonHeaderTitle(title: "Achievement Information", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 4),
-                  commonFillButtonView(
+                  isAdd ? commonFillButtonView(
+                      context: context,
+                      title: "SAVE",
+                      width: 70,
+                      height: 35,
+                      tapOnButton: () {
+                        CandidateController.to.addEditAchievementView(
+                            name: awardNameController.text,
+                            from: orgFromController.text,
+                            purpose: purposeController.text,
+                            remark: remarksController.text,
+                            attachment: attachmentImage,
+                            isEdit: isEdit,
+                            achievementId: selectedAchievement != null ? selectedAchievement!.id.toString() : "",
+                            status: selectedAchievement != null ? selectedAchievement!.status : "Active",
+                            callback: (){
+                              CandidateController.to.getAchievementsInfo();
+                              isAdd = false;
+                              isEdit = false;
+                            }
+                        );
+                      },
+                      isLoading: false) : commonFillButtonView(
                       context: context,
                       title: "ADD",
                       width: 70,
                       height: 35,
                       tapOnButton: () {
-
+                        setState(() {
+                          isAdd = true;
+                        });
                       },
                       isLoading: false)
                 ],
               ),
               commonVerticalSpacing(),
-              Obx(() => CandidateController.to.candidateAchievementsList.isNotEmpty ? SizedBox(
-                height: getScreenHeight(context) - 157,
-                child: ListView(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: CandidateController.to.candidateAchievementsList.map((e) => Container(
-                      padding: const EdgeInsets.all(12),
-                      margin: const EdgeInsets.only(bottom: 20),
-                      decoration: neurmorphicBoxDecoration,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              commonHeaderTitle(title: e.name ?? "", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 2),
-                              commonHeaderTitle(title: e.from ?? "", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 2),
-                            ],
-                          ),
-                          commonVerticalSpacing(),
-                          commonHeaderTitle(title: e.purpose ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                          commonVerticalSpacing(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              commonHeaderTitle(title: e.remark ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                              Expanded(flex: 2,child: Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: GestureDetector(
-                                      onTapDown: (TapDownDetails details) {
-                                        _showPopupMenu(details.globalPosition, e);
-                                      },
-                                      child: Container(
-                                          padding: const EdgeInsets.all(5.0),
-                                          decoration: const BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Color(0xffD9D9D9)
-                                          ),
-                                          child: Icon(Icons.more_vert_rounded,size: isTablet() ? 28 : 20)
-                                      )
-                                  )
-                              ))
-                            ],
-                          )
-                        ],
-                      ),
-                    )).toList()
-                ),
+              Obx(() => !isAdd ? ListView(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: CandidateController.to.candidateAchievementsList.map((e) => Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: neurmorphicBoxDecoration,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            commonHeaderTitle(title: e.name ?? "", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 2),
+                            commonHeaderTitle(title: e.from ?? "", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 2),
+                          ],
+                        ),
+                        commonVerticalSpacing(),
+                        commonHeaderTitle(title: e.purpose ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                        commonVerticalSpacing(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            commonHeaderTitle(title: e.remark ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                            Expanded(flex: 2,child: Align(
+                                alignment: Alignment.bottomRight,
+                                child: GestureDetector(
+                                    onTapDown: (TapDownDetails details) {
+                                      _showPopupMenu(details.globalPosition, e);
+                                    },
+                                    child: Container(
+                                        padding: const EdgeInsets.all(5.0),
+                                        decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Color(0xffD9D9D9)
+                                        ),
+                                        child: Icon(Icons.more_vert_rounded,size: isTablet() ? 28 : 20)
+                                    )
+                                )
+                            ))
+                          ],
+                        )
+                      ],
+                    ),
+                  )).toList()
               ) : ListView(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),

@@ -466,6 +466,7 @@ class IdentificationResponse {
 class Identification {
   Identification({
     this.candidateId,
+    this.id,
     this.idType,
     this.idNumber,
     this.issuedAuthority,
@@ -477,6 +478,7 @@ class Identification {
   });
 
   int? candidateId;
+  int? id;
   String? idType;
   String? idNumber;
   String? issuedAuthority;
@@ -488,6 +490,7 @@ class Identification {
 
   factory Identification.fromJson(Map<String, dynamic> json) => Identification(
     candidateId: json["candidate_id"],
+    id: json["id"],
     idType: json["id_type"],
     idNumber: json["id_number"],
     issuedAuthority: json["issued_authority"],
@@ -500,6 +503,7 @@ class Identification {
 
   Map<String, dynamic> toJson() => {
     "candidate_id": candidateId,
+    "id": id,
     "id_type": idType,
     "id_number": idNumber,
     "issued_authority": issuedAuthority,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../common_textfields/common_bottom_string_view.dart';
 import '../common_widgets/common_widgets_view.dart';
@@ -19,6 +20,7 @@ class _QuestionaryViewState extends State<QuestionaryView> {
   String selectedNoticePeriod = "";
   String expInYears = "";
   String expInMonths = "";
+  bool isEdit = false;
 
   @override
   void initState() {
@@ -49,6 +51,44 @@ class _QuestionaryViewState extends State<QuestionaryView> {
   Widget build(BuildContext context) {
     return commonStructure(
         context: context,
+        bottomNavigation: isEdit ? Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SizedBox(
+              height: 60,
+              child: Row(
+                children: [
+                  Expanded(child: commonBorderButtonView(
+                      context: context,
+                      title: "Cancel",
+                      height: 50,
+                      tapOnButton: () {
+                        Get.back();
+                      },
+                      isLoading: false)),
+                  commonHorizontalSpacing(),
+                  Expanded(child: commonFillButtonView(
+                      context: context,
+                      title: "Save",
+                      height: 50,
+                      tapOnButton: () {
+                        CandidateController.to.updateQuestionaryView(
+                          bondStatus: isCandidateAccept,
+                           relocateStatus: isReadyToRelocate,
+                           wfh: isPermanentWFH,
+                           months: expInMonths,
+                           years: expInYears,
+                           noticePeriod: selectedNoticePeriod,
+                           status: CandidateController.to.candidateDetail.value.status,
+                            callback: (){
+                              Get.back();
+                            });
+                      },
+                      isLoading: false)
+                  )
+                ],
+              )
+          ),
+        ) : Container(height: 0),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: ListView(
@@ -58,15 +98,15 @@ class _QuestionaryViewState extends State<QuestionaryView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   commonHeaderTitle(title: "Questionary", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 4),
-                  // commonFillButtonView(
-                  //     context: context,
-                  //     title: "ADD",
-                  //     width: 70,
-                  //     height: 35,
-                  //     tapOnButton: () {
-                  //
-                  //     },
-                  //     isLoading: false)
+                  commonFillButtonView(
+                      context: context,
+                      title: "Edit",
+                      width: 70,
+                      height: 35,
+                      tapOnButton: () {
+
+                      },
+                      isLoading: false)
                 ],
               ),
               commonVerticalSpacing(),
@@ -75,13 +115,11 @@ class _QuestionaryViewState extends State<QuestionaryView> {
                   isReadyToRelocate = val;
                 });
               },isSelected: isReadyToRelocate),
-              // commonVerticalSpacing(),
               commonCheckBoxTile(title: "Permanent work from home?",callback: (bool val){
                 setState(() {
                   isPermanentWFH = val;
                 });
               },isSelected: isPermanentWFH),
-              // commonVerticalSpacing(),
               commonCheckBoxTile(title: "Candidate Accept Bond?",callback: (bool val){
                 setState(() {
                   isCandidateAccept = val;

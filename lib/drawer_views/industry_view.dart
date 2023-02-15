@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../common_widgets/common_textfield.dart';
 import '../common_widgets/common_widgets_view.dart';
@@ -16,6 +17,7 @@ class IndustryView extends StatefulWidget {
 class _IndustryViewState extends State<IndustryView> {
   TextEditingController industryNameController = TextEditingController();
   TextEditingController industryExpertiseController = TextEditingController();
+  bool isEdit = false;
 
   @override
   void initState() {
@@ -32,6 +34,40 @@ class _IndustryViewState extends State<IndustryView> {
   Widget build(BuildContext context) {
     return commonStructure(
       context: context,
+        bottomNavigation: isEdit ? Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SizedBox(
+              height: 60,
+              child: Row(
+                children: [
+                  Expanded(child: commonBorderButtonView(
+                      context: context,
+                      title: "Cancel",
+                      height: 50,
+                      tapOnButton: () {
+                        Get.back();
+                      },
+                      isLoading: false)),
+                  commonHorizontalSpacing(),
+                  Expanded(child: commonFillButtonView(
+                      context: context,
+                      title: "Save",
+                      height: 50,
+                      tapOnButton: () {
+                        CandidateController.to.updateIndustryView(
+                            industryName: industryNameController.text,
+                            expertise: industryExpertiseController.text,
+                            status: CandidateController.to.candidateDetail.value.status,
+                            callback: (){
+                              Get.back();
+                            });
+                      },
+                      isLoading: false)
+                  )
+                ],
+              )
+          ),
+        ) : Container(height: 0),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(

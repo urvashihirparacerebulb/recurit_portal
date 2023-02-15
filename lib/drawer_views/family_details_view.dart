@@ -26,6 +26,9 @@ class _FamilyDetailsViewState extends State<FamilyDetailsView> {
   TextEditingController relationController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController mobileController = TextEditingController();
+  bool isAdd = false;
+  bool isEdit = false;
+  FamilyDetail? selectedFamilyInfo;
 
   @override
   void initState() {
@@ -50,7 +53,16 @@ class _FamilyDetailsViewState extends State<FamilyDetailsView> {
               value: 'Edit',
               child: InkWell(
                   onTap: (){
-                    Get.back();
+                    setState((){
+                      isAdd = true;
+                      isEdit = true;
+                      selectedFamilyInfo = familyDetail;
+                      nameController.text = familyDetail.relativeName ?? "";
+                      emailController.text = familyDetail.relativeEmail ?? "";
+                      relationController.text = familyDetail.relativeRelation ?? "";
+                      mobileController.text = familyDetail.relativePhone ?? "";
+                      occupationController.text = familyDetail.relativeOccupation ?? "";
+                    });
                   },
                   child: Row(
                     children: [
@@ -94,77 +106,100 @@ class _FamilyDetailsViewState extends State<FamilyDetailsView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   commonHeaderTitle(title: "Family Details", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 4),
-                  commonFillButtonView(
+                  isAdd ? commonFillButtonView(
+                      context: context,
+                      title: "SAVE",
+                      width: 70,
+                      height: 35,
+                      tapOnButton: () {
+                        CandidateController.to.addEditFamilyDetailView(
+                            name: nameController.text,
+                            phone: mobileController.text,
+                            email: emailController.text,
+                            countryCode: isEdit ? selectedFamilyInfo?.relativePhoneCountryCode : "in",
+                            dialCode: isEdit ? selectedFamilyInfo?.relativePhoneCountryCode : "91",
+                            occupation: occupationController.text,
+                            relation: relationController.text,
+                            isEdit: isEdit,
+                            relativeId: selectedFamilyInfo != null ? selectedFamilyInfo!.id.toString() : "",
+                            status: "Active",
+                            callback: (){
+                              CandidateController.to.getFamilyDetailInfo();
+                              isAdd = false;
+                              isEdit = false;
+                            }
+                        );
+                      },
+                      isLoading: false) : commonFillButtonView(
                       context: context,
                       title: "ADD",
                       width: 70,
                       height: 35,
                       tapOnButton: () {
-
+                        setState(() {
+                          isAdd = true;
+                        });
                       },
                       isLoading: false)
                 ],
               ),
               commonVerticalSpacing(),
-              Obx(() => CandidateController.to.candidateFamilyList.isNotEmpty ? SizedBox(
-                height: getScreenHeight(context) - 157,
-                child: ListView(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: CandidateController.to.candidateFamilyList.map((e) => Container(
-                      padding: const EdgeInsets.all(12),
-                      margin: const EdgeInsets.only(bottom: 20),
-                      decoration: neurmorphicBoxDecoration,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          commonHeaderTitle(title: e.relativeName ?? "", fontSize: isTablet() ? 1.3 : 1.4, fontWeight: 3),
-                          commonVerticalSpacing(spacing: 5),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              commonHeaderTitle(title: e.relativeOccupation ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                              commonHeaderTitle(title: e.relativeRelation ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                            ],
-                          ),
-                          commonVerticalSpacing(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  commonHeaderTitle(title: e.relativeEmail ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                                  commonVerticalSpacing(spacing: 5),
-                                  commonHeaderTitle(title: e.relativePhone ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                                ],
-                              ),
-                              Expanded(flex: 2,child: Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: GestureDetector(
-                                      onTapDown: (TapDownDetails details) {
-                                        _showPopupMenu(details.globalPosition, e);
-                                      },
-                                      child: Container(
-                                          padding: const EdgeInsets.all(5.0),
-                                          decoration: const BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Color(0xffD9D9D9)
-                                          ),
-                                          child: Icon(Icons.more_vert_rounded,size: isTablet() ? 28 : 20)
-                                      )
-                                  )
-                              ))
-                            ],
-                          )
-                        ],
-                      ),
-                    )).toList()
-                ),
+              Obx(() => !isAdd ? ListView(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: CandidateController.to.candidateFamilyList.map((e) => Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: neurmorphicBoxDecoration,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        commonHeaderTitle(title: e.relativeName ?? "", fontSize: isTablet() ? 1.3 : 1.4, fontWeight: 3),
+                        commonVerticalSpacing(spacing: 5),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            commonHeaderTitle(title: e.relativeOccupation ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                            commonHeaderTitle(title: e.relativeRelation ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                          ],
+                        ),
+                        commonVerticalSpacing(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                commonHeaderTitle(title: e.relativeEmail ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                                commonVerticalSpacing(spacing: 5),
+                                commonHeaderTitle(title: e.relativePhone ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                              ],
+                            ),
+                            Expanded(flex: 2,child: Align(
+                                alignment: Alignment.bottomRight,
+                                child: GestureDetector(
+                                    onTapDown: (TapDownDetails details) {
+                                      _showPopupMenu(details.globalPosition, e);
+                                    },
+                                    child: Container(
+                                        padding: const EdgeInsets.all(5.0),
+                                        decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Color(0xffD9D9D9)
+                                        ),
+                                        child: Icon(Icons.more_vert_rounded,size: isTablet() ? 28 : 20)
+                                    )
+                                )
+                            ))
+                          ],
+                        )
+                      ],
+                    ),
+                  )).toList()
               ) : ListView(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),

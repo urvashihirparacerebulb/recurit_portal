@@ -18,7 +18,7 @@ class SkillsView extends StatefulWidget {
 
 class _SkillsViewState extends State<SkillsView> {
   TextEditingController skillsController = TextEditingController();
-  String selectedSkillTag = "Master";
+  String selectedSkillTag = "1";
 
   @override
   void initState() {
@@ -53,9 +53,16 @@ class _SkillsViewState extends State<SkillsView> {
                       setState(() {
                         Skills skill = Skills();
                         skill.skill = skillsController.text;
-                        skill.level = (selectedSkillTag == "Master" ? "Master" : selectedSkillTag == "Intermediate" ? "Intermediate" : "Beginner");
-                        CandidateController.to.skillsList.add(skill);
-                        skillsController.text = "";
+                        skill.level = (selectedSkillTag == "1" ? "Master" : selectedSkillTag == "2" ? "Intermediate" : "Beginner");
+                        CandidateController.to.addEditSkillsView(
+                          status: "Active",
+                          level: skill.level,
+                          skill: skill.skill ?? "",
+                          callback: (){
+                            CandidateController.to.skillsList.add(skill);
+                            skillsController.text = "";
+                          }
+                        );
                       });
                     },
                     isLoading: false),
@@ -76,7 +83,9 @@ class _SkillsViewState extends State<SkillsView> {
                         groupValue: selectedSkillTag,
                         activeColor: greenColor,
                         onChanged: (value) {
-                          selectedSkillTag = value!;
+                          setState(() {
+                            selectedSkillTag = value!;
+                          });
                         },
                       ),
                       contentPadding: const EdgeInsets.all(0),
@@ -103,7 +112,9 @@ class _SkillsViewState extends State<SkillsView> {
                         groupValue: selectedSkillTag,
                         activeColor: primaryColor,
                         onChanged: (value) {
-                          selectedSkillTag = value!;
+                          setState(() {
+                            selectedSkillTag = value!;
+                          });
                         },
                       ),
                       contentPadding: const EdgeInsets.all(0),
@@ -129,7 +140,9 @@ class _SkillsViewState extends State<SkillsView> {
                         groupValue: selectedSkillTag,
                         activeColor: dangerColor,
                         onChanged: (value) {
-                          selectedSkillTag = value!;
+                          setState(() {
+                            selectedSkillTag = value!;
+                          });
                         },
                       ),
                       contentPadding: const EdgeInsets.all(0),

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cerebulb_recruit_portal/models/candidate_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -27,11 +26,13 @@ class _CertificationViewState extends State<CertificationView> {
   TextEditingController issuingOrgController = TextEditingController();
   TextEditingController credIdController = TextEditingController();
   TextEditingController credURLController = TextEditingController();
-  TextEditingController instituteNameController = TextEditingController();
   String issueDate = "";
   String expirationDate = "";
   bool isCredNotExpire = false;
   File? attachmentImage;
+  bool isAdd = false;
+  bool isEdit = false;
+  Certification? selectedCertification;
 
   @override
   void initState() {
@@ -84,11 +85,13 @@ class _CertificationViewState extends State<CertificationView> {
                 commonHorizontalSpacing(spacing: 10),
                 Container(height: 40, width: 1, color: fontColor),
                 commonHorizontalSpacing(spacing: 10),
-                selectedFile == null ? commonHeaderTitle(
+                selectedFile == null && !isEdit ? commonHeaderTitle(
                     title: "No File Chosen",
                     color: blackColor.withOpacity(0.4),
                     isChangeColor: true
-                ) : Expanded(child: Image.file(selectedFile, height: 100))
+                ) : Expanded(child: (selectedCertification != null && selectedFile == null) ?
+                Image.network(selectedCertification!.attachment ?? "", height: 100) :
+                Image.file(selectedFile!, height: 100))
               ],
             ),
           ),
@@ -97,7 +100,7 @@ class _CertificationViewState extends State<CertificationView> {
     );
   }
 
-  void _showPopupMenu(Offset offset,{Certification? certification}) async {
+  void _showPopupMenu(Offset offset,Certification certification) async {
     double left = offset.dx;
     double top = offset.dy;
     await showMenu(
@@ -114,7 +117,18 @@ class _CertificationViewState extends State<CertificationView> {
               value: 'Edit',
               child: InkWell(
                   onTap: (){
-                    Get.back();
+                    setState((){
+                      isAdd = true;
+                      isEdit = true;
+                      selectedCertification = certification;
+                      certificateNameController.text = certification.certificateName ?? "";
+                      issuingOrgController.text = certification.issuingOrganization ?? "";
+                      credIdController.text = certification.credentialId ?? "";
+                      credURLController.text = certification.credentialUrl ?? "";
+                      issueDate = certification.issueMonth ?? "";
+                      expirationDate = certification.expireMonth ?? "";
+                      isCredNotExpire = certification.doesNotExpire == "Yes" ? true : false;
+                    });
                   },
                   child: Row(
                     children: [
@@ -130,7 +144,7 @@ class _CertificationViewState extends State<CertificationView> {
                   onTap: (){
                     Get.back();
                     showDialog(context: context, builder: (BuildContext context) => DeleteDialogView(doneCallback: (){
-                      CandidateController.to.deleteCertificate(certificationId: (certification!.id ?? "").toString());
+                      CandidateController.to.deleteCertificate(certificationId: (certification.id ?? "").toString());
                     }));
                   },
                   child: Row(
@@ -173,73 +187,96 @@ class _CertificationViewState extends State<CertificationView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   commonHeaderTitle(title: "Certificates", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 4),
-                  commonFillButtonView(
+                  isAdd ? commonFillButtonView(
+                      context: context,
+                      title: "SAVE",
+                      width: 70,
+                      height: 35,
+                      tapOnButton: () {
+                        CandidateController.to.addEditCertificationView(
+                            certificateName: certificateNameController.text,
+                            credId: credIdController.text,
+                            credURL: credURLController.text,
+                            expireMonth: expirationDate,
+                            issueMonth: issueDate,
+                            issuingOrg: issuingOrgController.text,
+                            attachment: attachmentImage,
+                            isEdit: isEdit,
+                            certificationId: selectedCertification != null ? selectedCertification!.id.toString() : "",
+                            status: selectedCertification != null ? selectedCertification!.status : "Active",
+                            callback: (){
+                              CandidateController.to.getCertificationInfoList();
+                              isAdd = false;
+                              isEdit = false;
+                            }
+                        );
+                      },
+                      isLoading: false) : commonFillButtonView(
                       context: context,
                       title: "ADD",
                       width: 70,
                       height: 35,
                       tapOnButton: () {
-
+                        setState(() {
+                          isAdd = true;
+                        });
                       },
                       isLoading: false)
                 ],
               ),
               commonVerticalSpacing(),
-              Obx(() => CandidateController.to.certificationList.isNotEmpty ? SizedBox(
-                height: getScreenHeight(context) - 157,
-                child: ListView(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: CandidateController.to.certificationList.map((e) => Container(
-                      padding: const EdgeInsets.all(12),
-                      margin: const EdgeInsets.only(bottom: 20),
-                      decoration: neurmorphicBoxDecoration,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              commonHeaderTitle(title: e.certificateName ?? "", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 2),
-                              commonHeaderTitle(title: e.issuingOrganization ?? "", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 2),
-                            ],
-                          ),
-                          commonVerticalSpacing(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              commonHeaderTitle(title: e.issueMonth ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                              commonHeaderTitle(title: e.expireMonth ?? "-", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                            ],
-                          ),
-                          commonVerticalSpacing(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              commonHeaderTitle(title: e.credentialId ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                              Expanded(flex: 2,child: Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: GestureDetector(
-                                      onTapDown: (TapDownDetails details) {
-                                        _showPopupMenu(details.globalPosition, certification: e);
-                                      },
-                                      child: Container(
-                                          padding: const EdgeInsets.all(5.0),
-                                          decoration: const BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Color(0xffD9D9D9)
-                                          ),
-                                          child: Icon(Icons.more_vert_rounded,size: isTablet() ? 28 : 20))
-                                  )
-                              ))
-                            ],
-                          )
-                        ],
-                      ),
-                    )).toList()
-                ),
+              Obx(() => !isAdd ? ListView(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: CandidateController.to.certificationList.map((e) => Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: neurmorphicBoxDecoration,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            commonHeaderTitle(title: e.certificateName ?? "", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 2),
+                            commonHeaderTitle(title: e.issuingOrganization ?? "", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 2),
+                          ],
+                        ),
+                        commonVerticalSpacing(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            commonHeaderTitle(title: e.issueMonth ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                            commonHeaderTitle(title: e.expireMonth ?? "-", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                          ],
+                        ),
+                        commonVerticalSpacing(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            commonHeaderTitle(title: e.credentialId ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                            Expanded(flex: 2,child: Align(
+                                alignment: Alignment.bottomRight,
+                                child: GestureDetector(
+                                    onTapDown: (TapDownDetails details) {
+                                      _showPopupMenu(details.globalPosition, e);
+                                    },
+                                    child: Container(
+                                        padding: const EdgeInsets.all(5.0),
+                                        decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Color(0xffD9D9D9)
+                                        ),
+                                        child: Icon(Icons.more_vert_rounded,size: isTablet() ? 28 : 20))
+                                )
+                            ))
+                          ],
+                        )
+                      ],
+                    ),
+                  )).toList()
               ) : ListView(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),

@@ -9,7 +9,6 @@ import 'package:intl/intl.dart';
 import '../common_textfields/common_bottom_string_view.dart';
 import '../common_widgets/common_textfield.dart';
 import '../common_widgets/common_widgets_view.dart';
-import '../theme/convert_theme_colors.dart';
 import '../utility/screen_utility.dart';
 
 class BasicInformationView extends StatefulWidget {
@@ -85,11 +84,22 @@ class _BasicInformationViewState extends State<BasicInformationView> {
                     tapOnButton: () {
                       CandidateController.to.updateBasicInformation(
                           infoId: CandidateController.to.candidateDetail.value.candidateId.toString(),
+                          name: nameController.text,dob: dateOfBirth,email: emailController.text,
+                          emailTwo: secondaryEmailController.text,gender: selectedGender,pDialCode: CandidateController.to.candidateDetail.value.phoneDialCode,
+                          pCountryCode: CandidateController.to.candidateDetail.value.phoneCountryCode,
+                          pTwoCountryCode: CandidateController.to.candidateDetail.value.phoneTwoCountryCode,
+                          phone: mobileController.text,
+                          phoneTwo: otherMobileController.text,
+                          pTwoDialCode: CandidateController.to.candidateDetail.value.phoneTwoDialCode,
+                          status: CandidateController.to.candidateDetail.value.status,
+                          totalExpMonth: expInMonths,
+                          totalExpYear: expInYears,
                           callback: (){
-                            updateInfoRefresh();
+                            Get.back();
                           });
                     },
-                    isLoading: false),),
+                    isLoading: false)
+                )
               ],
             )
         ),
@@ -123,6 +133,7 @@ class _BasicInformationViewState extends State<BasicInformationView> {
                 // isBorderEnable: false,
                 textEditingController: nameController,
                 onChangedFunction: (String value){
+
                 },
                 validationFunction: (String value) {
                   return value.toString().isEmpty
@@ -158,7 +169,7 @@ class _BasicInformationViewState extends State<BasicInformationView> {
                 return value.toString().isEmpty
                     ? notEmptyFieldMessage
                     : null;
-              },),
+              }),
             commonVerticalSpacing(),
             InkWell(
               onTap: (){
@@ -198,7 +209,6 @@ class _BasicInformationViewState extends State<BasicInformationView> {
                             openCalendarView(
                               context,
                               initialDate: DateTime(DateTime.now().year - 18, 01, 01).toString(),
-
                             ).then((value) {
                               setState(() {
                                 dateOfBirth = DateFormat("dd-MM-yyyy").format(value);
