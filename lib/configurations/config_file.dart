@@ -38,12 +38,20 @@ class ApiConfig {
   static const String updateAchievementURL = "${baseURL}update-candidate-achievement/";
   static const String updateSkillURL = "${baseURL}update-candidate-skills/";
   static const String updateFamilyInfoURL = "${baseURL}update-candidate-family-info/";
+  static const String updateReferenceURL = "${baseURL}update-candidate-reference-info/";
+  static const String updateLanguageURL = "${baseURL}update-candidate-language-info/";
+  static const String updateQualificationURL = "${baseURL}update-candidate-qualification/";
+  static const String updateExperienceURL = "${baseURL}update-candidate-experience/";
 
   static const String addIdentificationURL = "${baseURL}add-candidate-identification";
   static const String addCertificationURL = "${baseURL}add-candidate-certification";
   static const String addAchievementURL = "${baseURL}add-candidate-achievement";
   static const String addSkillURL = "${baseURL}add-candidate-skills";
   static const String addFamilyInfoURL = "${baseURL}add-candidate-family-info";
+  static const String addReferenceURL = "${baseURL}add-candidate-reference-info";
+  static const String addLanguageURL = "${baseURL}add-candidate-language-info";
+  static const String addQualificationURL = "${baseURL}add-candidate-qualification";
+  static const String addExperienceURL = "${baseURL}add-candidate-experience";
 
   static const String methodPOST = "post";
   static const String methodGET = "get";

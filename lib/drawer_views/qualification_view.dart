@@ -23,7 +23,7 @@ class QualificationView extends StatefulWidget {
 }
 
 class _QualificationViewState extends State<QualificationView> {
-  File? marksheetImage;
+  List<ImageModel>? markSheetImages = [];
   File? certificateImage;
   TextEditingController instituteNameController = TextEditingController();
   TextEditingController departmentNameController = TextEditingController();
@@ -31,6 +31,9 @@ class _QualificationViewState extends State<QualificationView> {
   String durationFrom = "";
   String durationTo = "";
   bool isCurrentlyPersuing = false;
+  bool isAdd = false;
+  bool isEdit = false;
+  Qualification? selectedQualification;
 
   @override
   void initState() {
@@ -83,11 +86,13 @@ class _QualificationViewState extends State<QualificationView> {
                 commonHorizontalSpacing(spacing: 10),
                 Container(height: 40, width: 1, color: fontColor),
                 commonHorizontalSpacing(spacing: 10),
-                selectedFile == null ? commonHeaderTitle(
+                selectedFile == null && !isEdit ? commonHeaderTitle(
                     title: "No File Chosen",
                     color: blackColor.withOpacity(0.4),
                     isChangeColor: true
-                ) : Expanded(child: Image.file(selectedFile, height: 100))
+                ) : Expanded(child: (selectedQualification != null && selectedFile == null) ?
+                Image.network(selectedQualification!.certificate ?? "", height: 100) :
+                Image.file(selectedFile!, height: 100))
               ],
             ),
           ),
@@ -95,6 +100,74 @@ class _QualificationViewState extends State<QualificationView> {
       ),
     );
   }
+
+  multipleImageView({String title = "", Function? onChanged}) {
+    return SizedBox(
+      height: 80,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          commonHeaderTitle(
+              title: title,
+              color: blackColor,
+              isChangeColor: true
+          ),
+          commonVerticalSpacing(spacing: 8),
+          Container(
+            height: 50,
+            padding: const EdgeInsets.all(10),
+            decoration: neurmorphicBoxDecoration,
+            child: Row(
+              children: [
+                InkWell(
+                    onTap: () async {
+                      final ImagePicker picker = ImagePicker();
+                      try {
+                        final XFile? pickedFile = await picker.pickImage(
+                          source: ImageSource.gallery,
+                        );
+                        setState(() {
+                          onChanged!(File(pickedFile!.path));
+                        });
+                      } catch (e) {
+                        if (kDebugMode) {
+                          print(e);
+                        }
+                      }
+                    },
+                    child: commonHeaderTitle(
+                        title: "Choose File",
+                        color: blackColor.withOpacity(0.4),
+                        isChangeColor: true
+                    )
+                ),
+                commonHorizontalSpacing(spacing: 10),
+                Container(height: 40, width: 1, color: fontColor),
+                commonHorizontalSpacing(spacing: 10),
+                commonHeaderTitle(
+                    title: "No File Chosen",
+                    color: blackColor.withOpacity(0.4),
+                    isChangeColor: true
+                )
+              ],
+            ),
+          ),
+          commonVerticalSpacing(spacing: 8),
+          Expanded(child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: markSheetImages?.length,
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (context, index) {
+              return Image.file(markSheetImages![index].filePath!, height: 100);
+            },
+          ))
+        ],
+      ),
+    );
+  }
+
 
   void _showPopupMenu(Offset offset, Qualification qualification) async {
     double left = offset.dx;
@@ -113,7 +186,17 @@ class _QualificationViewState extends State<QualificationView> {
               value: 'Edit',
               child: InkWell(
                   onTap: (){
-                    Get.back();
+                    setState((){
+                      isAdd = true;
+                      isEdit = true;
+                      selectedQualification = qualification;
+                      instituteNameController.text = qualification.instituteName ?? "";
+                      departmentNameController.text = qualification.departmentName ?? "";
+                      degreeNameController.text = qualification.degreeName ?? "";
+                      durationFrom = qualification.fromMonth ?? "";
+                      durationTo = qualification.toMonth ?? "";
+                      isCurrentlyPersuing = qualification.persuing != null ? qualification.persuing == "Yes" ? true : false : false;
+                    });
                   },
                   child: Row(
                     children: [
@@ -174,19 +257,46 @@ class _QualificationViewState extends State<QualificationView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   commonHeaderTitle(title: "Qualification Information", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 4),
-                  commonFillButtonView(
+                  isAdd ? commonFillButtonView(
+                      context: context,
+                      title: "SAVE",
+                      width: 70,
+                      height: 35,
+                      tapOnButton: () {
+                        CandidateController.to.addEditQualificationInfo(
+                            name: instituteNameController.text,
+                            department: departmentNameController.text,
+                            degreeName: degreeNameController.text,
+                            fromMonth: durationFrom,
+                            toMonth: durationTo,
+                            persuing: isCurrentlyPersuing,
+                            isEdit: isEdit,
+                            qualificationId: selectedQualification != null ? selectedQualification!.id.toString() : "",
+                            status: "Active",
+                            certificate: certificateImage,
+                            markSheets: markSheetImages!.where((element) => element.filename != null).map((e) => e.filePath!).toList(),
+                            callback: (){
+                              CandidateController.to.getQualificationsList();
+                              isAdd = false;
+                              isEdit = false;
+                            }
+                        );
+                      },
+                      isLoading: false) : commonFillButtonView(
                       context: context,
                       title: "ADD",
                       width: 70,
                       height: 35,
                       tapOnButton: () {
-
+                        setState(() {
+                          isAdd = true;
+                        });
                       },
                       isLoading: false)
                 ],
               ),
               commonVerticalSpacing(),
-              Obx(() => CandidateController.to.qualificationsList.isNotEmpty ? ListView(
+              Obx(() => !isAdd ? ListView(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   children: CandidateController.to.qualificationsList.map((e) => Container(
@@ -301,11 +411,16 @@ class _QualificationViewState extends State<QualificationView> {
                       commonHorizontalSpacing(spacing: 10),
                       Expanded(child: InkWell(
                         onTap: (){
-                          showDialog(context: context, barrierDismissible: false,builder: (BuildContext context) => monthSelectionView(callback: (String val){
-                            setState(() {
-                              durationTo = val;
-                            });
-                          }));
+                          if(!isCurrentlyPersuing) {
+                            showDialog(context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext context) =>
+                                    monthSelectionView(callback: (String val) {
+                                      setState(() {
+                                        durationTo = val;
+                                      });
+                                    }));
+                          }
                         },
                         child: Container(
                           padding: const EdgeInsets.all(18),
@@ -324,11 +439,15 @@ class _QualificationViewState extends State<QualificationView> {
                     });
                   },isSelected: isCurrentlyPersuing),
                   commonVerticalSpacing(spacing: 15),
-                  imageView(title: "Marksheet", onChanged: (File file){
+                  multipleImageView(title: "Marksheet", onChanged: (File file){
                     setState(() {
-                      marksheetImage = file;
+                      ImageModel marksheet = ImageModel();
+                      marksheet.filename = "";
+                      marksheet.link = "";
+                      marksheet.filePath = file;
+                      markSheetImages?.add(marksheet);
                     });
-                  },selectedFile: marksheetImage),
+                  }),
                   commonVerticalSpacing(spacing: 20),
                   imageView(title: "Certificate", onChanged: (File file){
                     setState(() {

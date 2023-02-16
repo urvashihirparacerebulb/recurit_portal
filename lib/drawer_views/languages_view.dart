@@ -24,6 +24,9 @@ class _LanguagesViewState extends State<LanguagesView> {
   bool isRead = false;
   bool isWrite = false;
   bool isSpeak = false;
+  bool isAdd = false;
+  bool isEdit = false;
+  Language? selectedLanguage;
 
   @override
   void initState() {
@@ -48,7 +51,15 @@ class _LanguagesViewState extends State<LanguagesView> {
               value: 'Edit',
               child: InkWell(
                   onTap: (){
-                    Get.back();
+                    setState((){
+                      isAdd = true;
+                      isEdit = true;
+                      selectedLanguage = language;
+                      languageNameController.text = language.language ?? "";
+                      isRead = language.read != null ? language.read == "Yes" ? true : false : false;
+                      isWrite = language.write != null ? language.write == "Yes" ? true : false : false;
+                      isSpeak = language.speak != null ? language.speak == "Yes" ? true : false : false;
+                    });
                   },
                   child: Row(
                     children: [
@@ -93,19 +104,42 @@ class _LanguagesViewState extends State<LanguagesView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   commonHeaderTitle(title: "Language", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 2),
-                  commonFillButtonView(
+                  isAdd ? commonFillButtonView(
+                      context: context,
+                      title: "SAVE",
+                      width: 70,
+                      height: 35,
+                      tapOnButton: () {
+                        CandidateController.to.addEditLanguageInfo(
+                            langName: languageNameController.text,
+                            isRead: isRead,
+                            isWrite: isWrite,
+                            isSpeak: isSpeak,
+                            isEdit: isEdit,
+                            langId: selectedLanguage != null ? selectedLanguage!.id.toString() : "",
+                            status: "Active",
+                            callback: (){
+                              CandidateController.to.getLanguagesList();
+                              isAdd = false;
+                              isEdit = false;
+                            }
+                        );
+                      },
+                      isLoading: false) : commonFillButtonView(
                       context: context,
                       title: "ADD",
                       width: 70,
                       height: 35,
                       tapOnButton: () {
-
+                        setState(() {
+                          isAdd = true;
+                        });
                       },
                       isLoading: false)
                 ],
               ),
               commonVerticalSpacing(),
-              Obx(() => CandidateController.to.languagesList.isNotEmpty ? ListView(
+              Obx(() => !isAdd ? ListView(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   children: CandidateController.to.languagesList.map((e) => Container(

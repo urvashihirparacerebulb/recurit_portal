@@ -1,3 +1,5 @@
+import 'dart:io';
+
 class CandidateListResponseModel {
   CandidateListResponseModel({
     this.statusCode,
@@ -1027,7 +1029,7 @@ class Qualification {
   String? fromMonth;
   String? toMonth;
   String? persuing;
-  String? marksheet;
+  List<ImageModel>? marksheet;
   String? certificate;
   String? status;
   int? manageUserId;
@@ -1041,7 +1043,7 @@ class Qualification {
     fromMonth: json["from_month"],
     toMonth: json["to_month"],
     persuing: json["persuing"],
-    marksheet: json["marksheet"],
+    marksheet: List<ImageModel>.from(json["marksheet"].map((x) => ImageModel.fromJson(x))),
     certificate: json["certificate"],
     status: json["status"],
     manageUserId: json["manage_user_id"],
@@ -1056,10 +1058,32 @@ class Qualification {
     "from_month": fromMonth,
     "to_month": toMonth,
     "persuing": persuing,
-    "marksheet": marksheet,
+    "marksheet": marksheet == null ? [] : List<dynamic>.from(marksheet!.map((x) => x.toJson())),
     "certificate": certificate,
     "status": status,
     "manage_user_id": manageUserId,
+  };
+}
+
+class ImageModel {
+  ImageModel({
+    this.link,
+    this.filename,
+    this.filePath
+  });
+
+  String? link;
+  String? filename;
+  File? filePath;
+
+  factory ImageModel.fromJson(Map<String, dynamic> json) => ImageModel(
+    link: json["link"],
+    filename: json["filename"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "link": link,
+    "filename": filename,
   };
 }
 
@@ -1133,10 +1157,10 @@ class Experience {
   String? fromMonths;
   String? toMonths;
   String? offerLetter;
-  String? salarySlip;
+  List<ImageModel>? salarySlip;
   String? relievingLetter;
   String? experienceLetter;
-  String? otherAttachement;
+  List<ImageModel>? otherAttachement;
   String? status;
   int? manageUserId;
 
@@ -1149,10 +1173,10 @@ class Experience {
     fromMonths: json["from_months"],
     toMonths: json["to_months"],
     offerLetter: json["offer_letter"],
-    salarySlip: json["salary_slip"],
+    salarySlip: List<ImageModel>.from(json["salary_slip"].map((x) => ImageModel.fromJson(x))),
     relievingLetter: json["relieving_letter"],
     experienceLetter: json["experience_letter"],
-    otherAttachement: json["other_attachement"],
+    otherAttachement: List<ImageModel>.from(json["other_attachement"].map((x) => ImageModel.fromJson(x))),
     status: json["status"],
     manageUserId: json["manage_user_id"],
   );
@@ -1166,10 +1190,10 @@ class Experience {
     "from_months": fromMonths,
     "to_months": toMonths,
     "offer_letter": offerLetter,
-    "salary_slip": salarySlip,
+    "salary_slip": salarySlip == null ? [] : List<dynamic>.from(salarySlip!.map((x) => x.toJson())),
     "relieving_letter": relievingLetter,
     "experience_letter": experienceLetter,
-    "other_attachement": otherAttachement,
+    "other_attachement": otherAttachement == null ? [] : List<dynamic>.from(otherAttachement!.map((x) => x.toJson())),
     "status": status,
     "manage_user_id": manageUserId,
   };

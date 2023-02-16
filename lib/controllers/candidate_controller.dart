@@ -818,4 +818,127 @@ class CandidateController extends GetxController {
     );
   }
 
+  Future<void> addEditReferenceInfo({String name = "",designation, companyName, phone, email, status, countryCode, dialCode,
+    bool isEdit = false,
+    String referenceId = "",
+    Function? callback}) async {
+    dio.FormData formData = dio.FormData.fromMap({
+      "candidate_id": candidateId.value,
+      "reference_name": name,
+      "reference_company_name": companyName,
+      "reference_designation": designation,
+      "reference_phone": phone,
+      "reference_email": email,
+      "reference_phone_dial_code": dialCode,
+      "reference_phone_country_code": countryCode,
+      "status": status,
+      "manage_user_id": getLoginData()!.data?.manageUserId,
+      "updated_at": DateTime.now().toString()
+    });
+
+    if(!isEdit){
+      formData.fields.add(MapEntry("created_at", DateTime.now().toString()));
+    }
+
+    apiServiceCall(
+        params: {},
+        formValues: formData,
+        serviceUrl: isEdit ? (ApiConfig.updateReferenceURL + referenceId) : ApiConfig.addReferenceURL,
+        success: (dio.Response<dynamic> response) {
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
+  Future<void> addEditLanguageInfo({String langName = "",status, bool? isRead, isWrite, isSpeak,
+    bool isEdit = false,
+    String langId = "",
+    Function? callback}) async {
+    dio.FormData formData = dio.FormData.fromMap({
+      "candidate_id": candidateId.value,
+      "language": langName,
+      "read": isRead! ? "Yes" : "",
+      "write": isWrite ? "Yes" : "",
+      "speak": isSpeak ? "Yes" : "",
+      "status": status,
+      "manage_user_id": getLoginData()!.data?.manageUserId,
+      "updated_at": DateTime.now().toString()
+    });
+
+    if(!isEdit){
+      formData.fields.add(MapEntry("created_at", DateTime.now().toString()));
+    }
+
+    apiServiceCall(
+        params: {},
+        formValues: formData,
+        serviceUrl: isEdit ? (ApiConfig.updateLanguageURL + langId) : ApiConfig.addLanguageURL,
+        success: (dio.Response<dynamic> response) {
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
+  Future<void> addEditQualificationInfo({String name = "",department, degreeName, fromMonth, toMonth, status, bool persuing = false ,
+    bool isEdit = false,
+    File? certificate,
+    List<File> markSheets = const [],
+    String qualificationId = "",
+    Function? callback}) async {
+    dio.FormData formData = dio.FormData.fromMap({
+      "candidate_id": candidateId.value,
+      "institute_name": name,
+      "department_name": department,
+      "degree_name": degreeName,
+      "from_month": fromMonth,
+      "persuing": persuing ? "Yes" : "",
+      "to_month": toMonth,
+      "status": status,
+      "manage_user_id": getLoginData()!.data?.manageUserId,
+      "updated_at": DateTime.now().toString()
+    });
+
+    if(!isEdit){
+      formData.fields.add(MapEntry("created_at", DateTime.now().toString()));
+    }
+
+    if(certificate != null){
+      formData.files.add(
+          MapEntry("certificate", await dio
+              .MultipartFile.fromFile(certificate.path)));
+    }
+
+    if(markSheets.isNotEmpty){
+      for(int i = 0; i < markSheets.length; i++){
+        formData.files.add(
+            MapEntry("marksheet[$i]", await dio
+                .MultipartFile.fromFile(markSheets[i].path)));
+      }
+    }
+
+    apiServiceCall(
+        params: {},
+        formValues: formData,
+        serviceUrl: isEdit ? (ApiConfig.updateQualificationURL + qualificationId) : ApiConfig.addQualificationURL,
+        success: (dio.Response<dynamic> response) {
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
 }

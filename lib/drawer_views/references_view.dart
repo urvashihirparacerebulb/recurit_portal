@@ -27,6 +27,10 @@ class _ReferencesViewState extends State<ReferencesView> {
   TextEditingController emailController = TextEditingController();
   TextEditingController mobileController = TextEditingController();
 
+  bool isAdd = false;
+  bool isEdit = false;
+  Reference? selectedRefInfo;
+
   @override
   void initState() {
     CandidateController.to.getReferencesList();
@@ -50,7 +54,16 @@ class _ReferencesViewState extends State<ReferencesView> {
               value: 'Edit',
               child: InkWell(
                   onTap: (){
-                    Get.back();
+                    setState((){
+                      isAdd = true;
+                      isEdit = true;
+                      selectedRefInfo = reference;
+                      nameController.text = reference.referenceName ?? "";
+                      emailController.text = reference.referenceEmail ?? "";
+                      designationController.text = reference.referenceDesignation ?? "";
+                      mobileController.text = reference.referencePhone ?? "";
+                      companyNameController.text = reference.referenceCompanyName ?? "";
+                    });
                   },
                   child: Row(
                     children: [
@@ -94,19 +107,45 @@ class _ReferencesViewState extends State<ReferencesView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   commonHeaderTitle(title: "Reference Information", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 4),
-                  commonFillButtonView(
+                  isAdd ? commonFillButtonView(
+                      context: context,
+                      title: "SAVE",
+                      width: 70,
+                      height: 35,
+                      tapOnButton: () {
+                        CandidateController.to.addEditReferenceInfo(
+                            name: nameController.text,
+                            phone: mobileController.text,
+                            email: emailController.text,
+                            countryCode: isEdit ? selectedRefInfo?.referencePhoneCountryCode : "in",
+                            dialCode: isEdit ? selectedRefInfo?.referencePhoneDialCode : "91",
+                            designation: designationController.text,
+                            companyName: companyNameController.text,
+                            isEdit: isEdit,
+                            referenceId: selectedRefInfo != null ? selectedRefInfo!.id.toString() : "",
+                            status: "Active",
+                            callback: (){
+                              CandidateController.to.getReferencesList();
+                              isAdd = false;
+                              isEdit = false;
+                            }
+                        );
+                      },
+                      isLoading: false) : commonFillButtonView(
                       context: context,
                       title: "ADD",
                       width: 70,
                       height: 35,
                       tapOnButton: () {
-
+                        setState(() {
+                          isAdd = true;
+                        });
                       },
                       isLoading: false)
                 ],
               ),
               commonVerticalSpacing(),
-              Obx(() => CandidateController.to.referencesList.isNotEmpty ? ListView(
+              Obx(() => !isAdd ? ListView(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   children: CandidateController.to.referencesList.map((e) => Container(
@@ -142,8 +181,6 @@ class _ReferencesViewState extends State<ReferencesView> {
                                   commonHeaderTitle(title: e.referenceEmail ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
                                 ],
                               ),
-                              commonVerticalSpacing(),
-                              commonHeaderTitle(title: e.referenceEmail ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
                               commonVerticalSpacing(),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
