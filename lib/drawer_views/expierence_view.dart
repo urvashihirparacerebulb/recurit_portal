@@ -34,8 +34,12 @@ class _ExpierenceViewState extends State<ExpierenceView> {
   File? offerLetterImage;
   File? relievingLetterImage;
   File? experienceLetterImage;
-  File? salarySlipImage;
-  File? otherAttachmentImage;
+
+  bool isAdd = false;
+  bool isEdit = false;
+  Experience? selectedExperience;
+  List<ImageModel>? salarySlipsImages = [];
+  List<ImageModel>? otherAttachmentsImages = [];
 
   @override
   void initState() {
@@ -88,14 +92,96 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                 commonHorizontalSpacing(spacing: 10),
                 Container(height: 40, width: 1, color: fontColor),
                 commonHorizontalSpacing(spacing: 10),
-                selectedFile == null ? commonHeaderTitle(
+                selectedFile == null && !isEdit ? commonHeaderTitle(
                     title: "No File Chosen",
                     color: blackColor.withOpacity(0.4),
                     isChangeColor: true
-                ) : Expanded(child: Image.file(selectedFile, height: 100))
+                ) : Expanded(child: (selectedExperience != null && selectedFile == null) ?
+                (title == "Offer Letter" ? selectedExperience!.offerLetter == null :
+                title == "Relieving Letter" ? selectedExperience!.relievingLetter == null :
+                selectedExperience!.experienceLetter == null)? commonHeaderTitle(
+                    title: "No File Chosen",
+                    color: blackColor.withOpacity(0.4),
+                    isChangeColor: true
+                ) : Image.network((title == "Offer Letter" ? (selectedExperience!.offerLetter ?? "") :
+                title == "Relieving Letter" ? (selectedExperience!.relievingLetter ?? "") :
+                (selectedExperience!.experienceLetter ?? "")), height: 100) :
+                   Image.file(selectedFile!, height: 100)
+                )
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  multipleImageView({String title = "", Function? onChanged}) {
+    return SizedBox(
+      height: 80,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          commonHeaderTitle(
+              title: title,
+              color: blackColor,
+              isChangeColor: true
+          ),
+          commonVerticalSpacing(spacing: 8),
+          Container(
+            height: 50,
+            padding: const EdgeInsets.all(10),
+            decoration: neurmorphicBoxDecoration,
+            child: Row(
+              children: [
+                InkWell(
+                    onTap: () async {
+                      final ImagePicker picker = ImagePicker();
+                      try {
+                        final XFile? pickedFile = await picker.pickImage(
+                          source: ImageSource.gallery,
+                        );
+                        setState(() {
+                          onChanged!(File(pickedFile!.path));
+                        });
+                      } catch (e) {
+                        if (kDebugMode) {
+                          print(e);
+                        }
+                      }
+                    },
+                    child: commonHeaderTitle(
+                        title: "Choose File",
+                        color: blackColor.withOpacity(0.4),
+                        isChangeColor: true
+                    )
+                ),
+                commonHorizontalSpacing(spacing: 10),
+                Container(height: 40, width: 1, color: fontColor),
+                commonHorizontalSpacing(spacing: 10),
+                commonHeaderTitle(
+                    title: "No File Chosen",
+                    color: blackColor.withOpacity(0.4),
+                    isChangeColor: true
+                )
+              ],
+            ),
+          ),
+          commonVerticalSpacing(spacing: 8),
+          Expanded(child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: title == "Salary Slips" ? salarySlipsImages?.length : otherAttachmentsImages?.length,
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (context, index) {
+              if((title == "Salary Slips" ? salarySlipsImages![index].filePath : otherAttachmentsImages![index].filePath) == null){
+                return GetUtils.isPDF(title == "Salary Slips" ? salarySlipsImages![index].link ?? "" : otherAttachmentsImages![index].link ?? "") ?
+                const Icon(Icons.picture_as_pdf_outlined,color: dangerColor,size: 100,) : Image.network(title == "Salary Slips" ? salarySlipsImages![index].link ?? "" : otherAttachmentsImages![index].link ?? "", height: 100);
+              }
+              return Image.file(title == "Salary Slips" ? salarySlipsImages![index].filePath! : otherAttachmentsImages![index].filePath!, height: 100);
+            },
+          ))
         ],
       ),
     );
@@ -118,7 +204,23 @@ class _ExpierenceViewState extends State<ExpierenceView> {
               value: 'Edit',
               child: InkWell(
                   onTap: (){
-                    Get.back();
+                    setState((){
+                      isAdd = true;
+                      isEdit = true;
+                      selectedExperience = experience;
+                      profileNameController.text = experience.occupationName ?? "";
+                      companyNameController.text = experience.companyName ?? "";
+                      responsibilityController.text = experience.responsibility ?? "";
+                      durationFrom = experience.fromMonths ?? "";
+                      durationTo = experience.toMonths ?? "";
+                      isCurrentlyWorkingHere = experience.currentlyWorking != null ? experience.currentlyWorking == "Yes" ? true : false : false;
+                      if(experience.salarySlip!.isNotEmpty){
+                        salarySlipsImages!.addAll(experience.salarySlip ?? []);
+                      }
+                      if(experience.otherAttachement!.isNotEmpty){
+                        otherAttachmentsImages!.addAll(experience.otherAttachement ?? []);
+                      }
+                    });
                   },
                   child: Row(
                     children: [
@@ -178,19 +280,49 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   commonHeaderTitle(title: "Experience", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 4),
-                  commonFillButtonView(
+                  isAdd ? commonFillButtonView(
+                      context: context,
+                      title: "SAVE",
+                      width: 70,
+                      height: 35,
+                      tapOnButton: () {
+                        CandidateController.to.addEditExperienceInfo(
+                            name: profileNameController.text,
+                            companyName: companyNameController.text,
+                            responsibility: responsibilityController.text,
+                            fromMonth: durationFrom,
+                            toMonth: durationTo,
+                            currentlyWorking: isCurrentlyWorkingHere,
+                            isEdit: isEdit,
+                            expId: selectedExperience != null ? selectedExperience!.id.toString() : "",
+                            status: "Active",
+                            offerLetter: offerLetterImage,
+                            experienceLetter: experienceLetterImage,
+                            relievingLetter: relievingLetterImage,
+                            salarySlips: salarySlipsImages!.where((element) => element.filename != null).map((e) => e.filePath!).toList(),
+                            otherAttachments: otherAttachmentsImages!.where((element) => element.filename != null).map((e) => e.filePath!).toList(),
+                            callback: (){
+                              CandidateController.to.getExperiencesList();
+                              isAdd = false;
+                              isEdit = false;
+                            }
+                        );
+                      },
+                      isLoading: false) : commonFillButtonView(
                       context: context,
                       title: "ADD",
                       width: 70,
                       height: 35,
                       tapOnButton: () {
-
+                        setState(() {
+                          isAdd = true;
+                        });
                       },
                       isLoading: false)
                 ],
               ),
               commonVerticalSpacing(),
-              Obx(() => CandidateController.to.experiencesList.isNotEmpty ? ListView(
+              Obx(() => !isAdd ? ListView(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   children: CandidateController.to.experiencesList.map((e) => Container(
@@ -347,18 +479,27 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                       experienceLetterImage = file;
                     });
                   },selectedFile: experienceLetterImage),
-                  commonVerticalSpacing(spacing: 20),
-                  imageView(title: "Salary Slip", onChanged: (File file){
+                  commonVerticalSpacing(spacing: 15),
+                  multipleImageView(title: "Salary Slips", onChanged: (File file){
                     setState(() {
-                      salarySlipImage = file;
+                      ImageModel marksheet = ImageModel();
+                      marksheet.filename = "";
+                      marksheet.link = "";
+                      marksheet.filePath = file;
+                      salarySlipsImages?.add(marksheet);
                     });
-                  },selectedFile: salarySlipImage),
+                  }),
                   commonVerticalSpacing(spacing: 20),
-                  imageView(title: "Other Attachments", onChanged: (File file){
+                  multipleImageView(title: "Other attachments", onChanged: (File file){
                     setState(() {
-                      otherAttachmentImage = file;
+                      ImageModel marksheet = ImageModel();
+                      marksheet.filename = "";
+                      marksheet.link = "";
+                      marksheet.filePath = file;
+                      otherAttachmentsImages?.add(marksheet);
                     });
-                  },selectedFile: otherAttachmentImage),
+                  }),
+                  commonVerticalSpacing(spacing: 20),
                 ],
               ))
             ],

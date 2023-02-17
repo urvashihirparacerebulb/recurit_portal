@@ -11,6 +11,7 @@ import '../common_widgets/common_widgets_view.dart';
 import '../controllers/candidate_controller.dart';
 import '../theme/convert_theme_colors.dart';
 import '../utility/color_utility.dart';
+import '../utility/common_methods.dart';
 import '../utility/constants.dart';
 import '../utility/delete_dialog_view.dart';
 import '../utility/screen_utility.dart';
@@ -91,8 +92,13 @@ class _QualificationViewState extends State<QualificationView> {
                     color: blackColor.withOpacity(0.4),
                     isChangeColor: true
                 ) : Expanded(child: (selectedQualification != null && selectedFile == null) ?
-                Image.network(selectedQualification!.certificate ?? "", height: 100) :
-                Image.file(selectedFile!, height: 100))
+                      selectedQualification!.certificate == null ? commonHeaderTitle(
+                          title: "No File Chosen",
+                          color: blackColor.withOpacity(0.4),
+                          isChangeColor: true
+                      ) : Image.network(selectedQualification!.certificate ?? "", height: 100) :
+                    Image.file(selectedFile!, height: 100)
+                )
               ],
             ),
           ),
@@ -103,7 +109,7 @@ class _QualificationViewState extends State<QualificationView> {
 
   multipleImageView({String title = "", Function? onChanged}) {
     return SizedBox(
-      height: 80,
+      height: markSheetImages!.isNotEmpty ? 180 : 80,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -160,6 +166,15 @@ class _QualificationViewState extends State<QualificationView> {
             itemCount: markSheetImages?.length,
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) {
+              if(markSheetImages![index].filePath == null){
+                return InkWell(
+                  onTap: (){
+                    launchInBrowser(markSheetImages![index].link ?? "");
+                  },
+                  child: GetUtils.isPDF(markSheetImages![index].link ?? "") ?
+                  const Icon(Icons.picture_as_pdf_outlined,color: dangerColor,size: 100,) : Image.network(markSheetImages![index].link ?? "", height: 100),
+                );
+              }
               return Image.file(markSheetImages![index].filePath!, height: 100);
             },
           ))
@@ -167,7 +182,6 @@ class _QualificationViewState extends State<QualificationView> {
       ),
     );
   }
-
 
   void _showPopupMenu(Offset offset, Qualification qualification) async {
     double left = offset.dx;
@@ -196,6 +210,9 @@ class _QualificationViewState extends State<QualificationView> {
                       durationFrom = qualification.fromMonth ?? "";
                       durationTo = qualification.toMonth ?? "";
                       isCurrentlyPersuing = qualification.persuing != null ? qualification.persuing == "Yes" ? true : false : false;
+                      if(qualification.marksheet!.isNotEmpty){
+                        markSheetImages!.addAll(qualification.marksheet ?? []);
+                      }
                     });
                   },
                   child: Row(

@@ -1138,6 +1138,7 @@ class Experience {
     this.occupationName,
     this.companyName,
     this.responsibility,
+    this.currentlyWorking,
     this.fromMonths,
     this.toMonths,
     this.offerLetter,
@@ -1157,6 +1158,7 @@ class Experience {
   String? fromMonths;
   String? toMonths;
   String? offerLetter;
+  String? currentlyWorking;
   List<ImageModel>? salarySlip;
   String? relievingLetter;
   String? experienceLetter;
@@ -1171,6 +1173,7 @@ class Experience {
     companyName: json["company_name"],
     responsibility: json["responsibility"],
     fromMonths: json["from_months"],
+    currentlyWorking: json["currently_working"],
     toMonths: json["to_months"],
     offerLetter: json["offer_letter"],
     salarySlip: List<ImageModel>.from(json["salary_slip"].map((x) => ImageModel.fromJson(x))),
@@ -1188,6 +1191,7 @@ class Experience {
     "company_name": companyName,
     "responsibility": responsibility,
     "from_months": fromMonths,
+    "currently_working": currentlyWorking,
     "to_months": toMonths,
     "offer_letter": offerLetter,
     "salary_slip": salarySlip == null ? [] : List<dynamic>.from(salarySlip!.map((x) => x.toJson())),
@@ -1196,5 +1200,77 @@ class Experience {
     "other_attachement": otherAttachement == null ? [] : List<dynamic>.from(otherAttachement!.map((x) => x.toJson())),
     "status": status,
     "manage_user_id": manageUserId,
+  };
+}
+
+class AttachmentsResponseModel {
+  AttachmentsResponseModel({
+    this.statusCode,
+    this.status,
+    this.message,
+    this.data,
+  });
+
+  int? statusCode;
+  bool? status;
+  String? message;
+  AttachmentsResponse? data;
+
+  factory AttachmentsResponseModel.fromJson(Map<String, dynamic> json) => AttachmentsResponseModel(
+    statusCode: json["statusCode"],
+    status: json["status"],
+    message: json["message"],
+    data: AttachmentsResponse.fromJson(json["data"]),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "statusCode": statusCode,
+    "status": status,
+    "message": message,
+    "data": data?.toJson(),
+  };
+}
+
+class AttachmentsResponse {
+  AttachmentsResponse({
+    this.data,
+  });
+
+  List<Attachments>? data;
+
+  factory AttachmentsResponse.fromJson(Map<String, dynamic> json) => AttachmentsResponse(
+    data: List<Attachments>.from(json["data"].map((x) => Attachments.fromJson(x))),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "data": data == null ? [] : List<dynamic>.from(data!.map((x) => x.toJson())),
+  };
+}
+
+class Attachments {
+  Attachments({
+    this.candidateId,
+    this.resume,
+    this.coverLetter,
+    this.otherAttachment,
+  });
+
+  int? candidateId;
+  String? resume;
+  String? coverLetter;
+  List<ImageModel>? otherAttachment;
+
+  factory Attachments.fromJson(Map<String, dynamic> json) => Attachments(
+    candidateId: json["candidate_id"],
+    resume: json["resume"],
+    coverLetter: json["cover_letter"],
+    otherAttachment: json["other_attachment"] == null ? [] : List<ImageModel>.from(json["other_attachment"].map((x) => ImageModel.fromJson(x))),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "candidate_id": candidateId,
+    "resume": resume,
+    "cover_letter": coverLetter,
+    "other_attachment": otherAttachment == null ? [] : List<dynamic>.from(otherAttachment!.map((x) => x.toJson())),
   };
 }

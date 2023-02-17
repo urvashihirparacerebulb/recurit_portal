@@ -17,6 +17,7 @@ class ApiConfig {
   static const String fetchLanguageInfoURL = "${baseURL}fetch-language-info";
   static const String fetchQualificationURL = "${baseURL}fetch-qualification";
   static const String fetchExperienceURL = "${baseURL}fetch-experience";
+  static const String fetchAttachmentURL = "${baseURL}fetch-candidate-attachment-info";
 
   static const String deleteCertificateURL = "${baseURL}delete-candidate-certification/";
   static const String deleteAchievementURL = "${baseURL}delete-candidate-achievement/";
@@ -42,6 +43,7 @@ class ApiConfig {
   static const String updateLanguageURL = "${baseURL}update-candidate-language-info/";
   static const String updateQualificationURL = "${baseURL}update-candidate-qualification/";
   static const String updateExperienceURL = "${baseURL}update-candidate-experience/";
+  static const String updateAttachmentURL = "${baseURL}update-candidate-attachment-info/";
 
   static const String addIdentificationURL = "${baseURL}add-candidate-identification";
   static const String addCertificationURL = "${baseURL}add-candidate-certification";

@@ -7,6 +7,8 @@ import '../configurations/config_file.dart';
 import '../main.dart';
 import '../models/login_response_model.dart';
 import 'color_utility.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 isNotEmptyString(String? string) {
   return string != null && string.isNotEmpty;
@@ -38,6 +40,15 @@ LoginResponseModel? getLoginData() {
     return loginResponse;
   } else {
     return null;
+  }
+}
+
+Future<void> launchInBrowser(String myUrl) async {
+  Uri url = Uri.parse(myUrl);
+  if(await canLaunchUrl(url)){
+    await launchUrl(url);
+  }else {
+    throw 'Could not launch $url';
   }
 }
 

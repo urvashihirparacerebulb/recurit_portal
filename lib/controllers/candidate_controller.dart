@@ -25,6 +25,7 @@ class CandidateController extends GetxController {
   RxList<Qualification> qualificationsList = RxList<Qualification>();
   RxList<Experience> experiencesList = RxList<Experience>();
   Rx<CandidateDetail> candidateDetail = CandidateDetail().obs;
+  Rx<Attachments> attachmentDetail = Attachments().obs;
   RxString candidateId = "275".obs;
 
   void getCandidateListData() {
@@ -308,6 +309,25 @@ class CandidateController extends GetxController {
         success: (dio.Response<dynamic> response) {
           ExperienceResponseModel experienceResponseModel = ExperienceResponseModel.fromJson(jsonDecode(response.data));
           experiencesList.value = experienceResponseModel.data!.data ?? [];
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
+  void getAttachmentsList({Function? callback}) {
+    apiServiceCall(
+        params: {
+          "candidate_id": candidateId.value
+        },
+        serviceUrl: ApiConfig.fetchAttachmentURL,
+        success: (dio.Response<dynamic> response) {
+          AttachmentsResponse attachmentsResponse = AttachmentsResponse.fromJson(jsonDecode(response.data));
+          attachmentDetail.value = attachmentsResponse.data!.first;
+          callback!();
         },
         error: (dio.Response<dynamic> response) {
           errorHandling(response);
@@ -941,4 +961,119 @@ class CandidateController extends GetxController {
     );
   }
 
+  Future<void> addEditExperienceInfo({String name = "",companyName, responsibility, fromMonth, toMonth, status, bool currentlyWorking = false ,
+    bool isEdit = false,
+    File? offerLetter,
+    File? relievingLetter,
+    File? experienceLetter,
+    List<File> salarySlips = const [],
+    List<File> otherAttachments = const [],
+    String expId = "",
+    Function? callback}) async {
+    dio.FormData formData = dio.FormData.fromMap({
+      "candidate_id": candidateId.value,
+      "occupation_name": name,
+      "company_name": companyName,
+      "responsibility": responsibility,
+      "from_months": fromMonth,
+      "currently_working": currentlyWorking ? "Yes" : "",
+      "to_months": toMonth,
+      "status": status,
+      "manage_user_id": getLoginData()!.data?.manageUserId,
+      "updated_at": DateTime.now().toString()
+    });
+
+    if(!isEdit){
+      formData.fields.add(MapEntry("created_at", DateTime.now().toString()));
+    }
+
+    if(offerLetter != null){
+      formData.files.add(
+          MapEntry("offer_letter", await dio
+              .MultipartFile.fromFile(offerLetter.path)));
+    }
+    if(relievingLetter != null){
+      formData.files.add(
+          MapEntry("relieving_letter", await dio
+              .MultipartFile.fromFile(relievingLetter.path)));
+    }
+    if(experienceLetter != null){
+      formData.files.add(
+          MapEntry("experience_letter", await dio
+              .MultipartFile.fromFile(experienceLetter.path)));
+    }
+
+    if(salarySlips.isNotEmpty){
+      for(int i = 0; i < salarySlips.length; i++){
+        formData.files.add(
+            MapEntry("salary_slip[$i]", await dio
+                .MultipartFile.fromFile(salarySlips[i].path)));
+      }
+    }
+    if(otherAttachments.isNotEmpty){
+      for(int i = 0; i < otherAttachments.length; i++){
+        formData.files.add(
+            MapEntry("other_attachement[$i]", await dio
+                .MultipartFile.fromFile(otherAttachments[i].path)));
+      }
+    }
+
+    apiServiceCall(
+        params: {},
+        formValues: formData,
+        serviceUrl: isEdit ? (ApiConfig.updateExperienceURL + expId) : ApiConfig.addExperienceURL,
+        success: (dio.Response<dynamic> response) {
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
+  Future<void> editAttachmentsInfo({File? coverLetter,
+    File? resume,
+    List<File> otherAttachments = const [],
+    Function? callback}) async {
+    dio.FormData formData = dio.FormData.fromMap({
+      "status": "Active",
+      "manage_user_id": getLoginData()!.data?.manageUserId,
+      "updated_at": DateTime.now().toString()
+    });
+
+    if(coverLetter != null){
+      formData.files.add(
+          MapEntry("cover_letter", await dio
+              .MultipartFile.fromFile(coverLetter.path)));
+    }
+    if(resume != null){
+      formData.files.add(
+          MapEntry("resume", await dio
+              .MultipartFile.fromFile(resume.path)));
+    }
+
+    if(otherAttachments.isNotEmpty){
+      for(int i = 0; i < otherAttachments.length; i++){
+        formData.files.add(
+            MapEntry("other_attachment[$i]", await dio
+                .MultipartFile.fromFile(otherAttachments[i].path)));
+      }
+    }
+
+    apiServiceCall(
+        params: {},
+        formValues: formData,
+        serviceUrl: ApiConfig.updateAttachmentURL,
+        success: (dio.Response<dynamic> response) {
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
 }
