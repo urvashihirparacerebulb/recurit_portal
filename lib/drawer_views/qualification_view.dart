@@ -167,12 +167,30 @@ class _QualificationViewState extends State<QualificationView> {
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) {
               if(markSheetImages![index].filePath == null){
-                return InkWell(
-                  onTap: (){
-                    launchInBrowser(markSheetImages![index].link ?? "");
-                  },
-                  child: GetUtils.isPDF(markSheetImages![index].link ?? "") ?
-                  const Icon(Icons.picture_as_pdf_outlined,color: dangerColor,size: 100,) : Image.network(markSheetImages![index].link ?? "", height: 100),
+                return Row(
+                  children: [
+                    InkWell(
+                      onTap: (){
+                        launchInBrowser(markSheetImages![index].link ?? "");
+                      },
+                      child: GetUtils.isPDF(markSheetImages![index].link ?? "") ?
+                      const Icon(Icons.picture_as_pdf_outlined,color: dangerColor,size: 100,) : Image.network(markSheetImages![index].link ?? "", height: 100),
+                    ),
+                    commonHorizontalSpacing(spacing: 20),
+                    InkWell(
+                      onTap: (){
+                        CandidateController.to.deleteMarkSheetsInQualification(
+                            qulId: selectedQualification?.id,
+                            docName: markSheetImages![index].filename ?? "",
+                            callback: () {
+                              CandidateController.to.getQualificationsList();
+                            }
+                        );
+                      },
+                      child: const Icon(Icons.delete_forever_outlined, color: dangerColor),
+                    ),
+                    commonHorizontalSpacing(spacing: 20),
+                  ],
                 );
               }
               return Image.file(markSheetImages![index].filePath!, height: 100);

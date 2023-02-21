@@ -1239,7 +1239,7 @@ class AttachmentsResponse {
   List<Attachments>? data;
 
   factory AttachmentsResponse.fromJson(Map<String, dynamic> json) => AttachmentsResponse(
-    data: List<Attachments>.from(json["data"].map((x) => Attachments.fromJson(x))),
+    data: json["data"] == null ? [] : List<Attachments>.from(json["data"].map((x) => Attachments.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {

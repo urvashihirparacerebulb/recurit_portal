@@ -18,6 +18,10 @@ class ApiConfig {
   static const String fetchQualificationURL = "${baseURL}fetch-qualification";
   static const String fetchExperienceURL = "${baseURL}fetch-experience";
   static const String fetchAttachmentURL = "${baseURL}fetch-candidate-attachment-info";
+  static const String fetchCountriesURL = "${baseURL}fetch-country-info";
+  static const String fetchStatesURL = "${baseURL}fetch-state-info";
+  static const String fetchCityURL = "${baseURL}fetch-city-info";
+  static const String fetchPinCodesURL = "${baseURL}fetch-pincode-info";
 
   static const String deleteCertificateURL = "${baseURL}delete-candidate-certification/";
   static const String deleteAchievementURL = "${baseURL}delete-candidate-achievement/";
@@ -28,6 +32,10 @@ class ApiConfig {
   static const String deleteLanguageURL = "${baseURL}delete-candidate-language-info/";
   static const String deleteQualificationURL = "${baseURL}delete-candidate-qualification/";
   static const String deleteExperienceURL = "${baseURL}delete-candidate-experience/";
+  static const String deleteOtherAttachmentURL = "${baseURL}delete-candidate-other-attachments";
+  static const String deleteOtherAttachmentExperienceURL = "${baseURL}delete-other-attachment";
+  static const String deleteSalarySlipsExperienceURL = "${baseURL}delete-salary-slip";
+  static const String deleteMarkSheetURL = "${baseURL}delete-candidate-marksheet";
 
   static const String updateBasicInformationURL = "${baseURL}update-candidate-basic-info/";
   static const String updateAddressURL = "${baseURL}update-candidate-address-info/";
@@ -54,6 +62,7 @@ class ApiConfig {
   static const String addLanguageURL = "${baseURL}add-candidate-language-info";
   static const String addQualificationURL = "${baseURL}add-candidate-qualification";
   static const String addExperienceURL = "${baseURL}add-candidate-experience";
+  static const String addNewPinCode = "${baseURL}add-pincode";
 
   static const String methodPOST = "post";
   static const String methodGET = "get";

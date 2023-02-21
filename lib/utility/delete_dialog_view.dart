@@ -26,10 +26,10 @@ class _DeleteDialogViewState extends State<DeleteDialogView> {
 
   Widget deleteDialogContent(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 0.0,right: 0.0),
+      margin: const EdgeInsets.only(left: 0.0, right: 0.0),
       child: Container(
-        padding: const EdgeInsets.only(top: 18.0,),
-        margin: const EdgeInsets.only(top: 13.0,right: 8.0),
+        padding: const EdgeInsets.only(top: 18.0),
+        margin: const EdgeInsets.only(top: 13.0, right: 8.0),
         decoration: BoxDecoration(
             color: whiteColor,
             shape: BoxShape.rectangle,
@@ -68,7 +68,8 @@ class _DeleteDialogViewState extends State<DeleteDialogView> {
                         tapOnButton: () {
                           Get.back();
                         },
-                        isLoading: false),
+                        isLoading: false
+                    ),
                   ),
                   commonHorizontalSpacing(spacing: 10),
                   Expanded(

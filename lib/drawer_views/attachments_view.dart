@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cerebulb_recruit_portal/models/candidate_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/utils.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -22,24 +23,28 @@ class AttachmentsView extends StatefulWidget {
 class _AttachmentsViewState extends State<AttachmentsView> {
   File? resumeImage;
   File? coverLetterImage;
-  bool isAdd = false;
   bool isEdit = false;
   Attachments? selectedAttachment;
   List<ImageModel>? otherAttachmentsImages = [];
 
   @override
   void initState() {
-    CandidateController.to.getAttachmentsList(
-      callback: (){
-        setState(() {
-          selectedAttachment = CandidateController.to.attachmentDetail.value;
-          if(selectedAttachment!.otherAttachment!.isNotEmpty){
-            otherAttachmentsImages!.addAll(selectedAttachment!.otherAttachment ?? []);
-          }
-        });
-      }
-    );
+    getListOfAttachments();
     super.initState();
+  }
+
+  getListOfAttachments(){
+    otherAttachmentsImages?.clear();
+    CandidateController.to.getAttachmentsList(
+        callback: (){
+          setState(() {
+            selectedAttachment = CandidateController.to.attachmentDetail.value;
+            if(selectedAttachment!.otherAttachment!.isNotEmpty){
+              otherAttachmentsImages!.addAll(selectedAttachment!.otherAttachment ?? []);
+            }
+          });
+        }
+    );
   }
 
   imageView({String title = "", Function? onChanged, File? selectedFile}) {
@@ -87,11 +92,11 @@ class _AttachmentsViewState extends State<AttachmentsView> {
                 commonHorizontalSpacing(spacing: 10),
                 Container(height: 40, width: 1, color: fontColor),
                 commonHorizontalSpacing(spacing: 10),
-                selectedFile == null && !isEdit ? commonHeaderTitle(
+                selectedFile == null ? commonHeaderTitle(
                     title: "No File Chosen",
                     color: blackColor.withOpacity(0.4),
                     isChangeColor: true
-                ) : Expanded(child: (selectedAttachment != null && selectedFile == null) ?
+                ) : Expanded(child: (selectedAttachment != null) ?
                 (title == "Resume" ? selectedAttachment!.resume == null :
                 selectedAttachment!.coverLetter == null) ? commonHeaderTitle(
                     title: "No File Chosen",
@@ -99,7 +104,7 @@ class _AttachmentsViewState extends State<AttachmentsView> {
                     isChangeColor: true
                 ) : Image.network((title == "Resume" ? (selectedAttachment!.resume ?? "") :
                 (selectedAttachment!.coverLetter ?? "")), height: 100) :
-                Image.file(selectedFile!, height: 100)
+                Image.file(selectedFile, height: 100)
                 )
               ],
             ),
@@ -164,20 +169,54 @@ class _AttachmentsViewState extends State<AttachmentsView> {
           ),
           commonVerticalSpacing(spacing: 8),
           Expanded(child: ListView.builder(
-            shrinkWrap: true,
+            // shrinkWrap: true,
             itemCount: otherAttachmentsImages?.length,
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) {
               if(otherAttachmentsImages![index].filePath == null){
-                return InkWell(
-                  onTap: (){
-                    launchInBrowser(otherAttachmentsImages![index].link ?? "");
-                  },
-                  child: GetUtils.isPDF(otherAttachmentsImages![index].link ?? "") ?
-                  const Icon(Icons.picture_as_pdf_outlined,color: dangerColor,size: 100,) : Image.network(otherAttachmentsImages![index].link ?? "", height: 100),
+                return Row(
+                  children: [
+                    InkWell(
+                      onTap: (){
+                        launchInBrowser(otherAttachmentsImages![index].link ?? "");
+                      },
+                      child: GetUtils.isPDF(otherAttachmentsImages![index].link ?? "") ?
+                      const Icon(Icons.picture_as_pdf_outlined,color: dangerColor,size: 100) :
+                      Image.network(otherAttachmentsImages![index].link ?? "", height: 100),
+                    ),
+                    commonHorizontalSpacing(spacing: 20),
+                    InkWell(
+                      onTap: (){
+                        CandidateController.to.deleteOtherAttachment(
+                          docName: otherAttachmentsImages![index].filename ?? "",
+                          callback: (){
+                            getListOfAttachments();
+                          }
+                        );
+                      },
+                      child: const Icon(Icons.delete_forever_outlined, color: dangerColor),
+                    ),
+                    commonHorizontalSpacing(spacing: 20),
+                  ],
                 );
               }
-              return Image.file(otherAttachmentsImages![index].filePath!, height: 100);
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.file(otherAttachmentsImages![index].filePath!, height: 100),
+                  commonHorizontalSpacing(spacing: 20),
+                  InkWell(
+                    onTap: (){
+                      setState(() {
+                        otherAttachmentsImages!.removeAt(index);
+                      });
+                    },
+                    child: const Icon(Icons.delete_forever_outlined, color: dangerColor),
+                  ),
+                  commonHorizontalSpacing(spacing: 20),
+                ],
+              );
             },
           ))
         ],
@@ -189,7 +228,43 @@ class _AttachmentsViewState extends State<AttachmentsView> {
   Widget build(BuildContext context) {
     return commonStructure(
       context: context,
-      child: Padding(
+        bottomNavigation: isEdit ? Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SizedBox(
+              height: 60,
+              child: Row(
+                children: [
+                  Expanded(child: commonBorderButtonView(
+                      context: context,
+                      title: "Cancel",
+                      height: 50,
+                      tapOnButton: () {
+                        Get.back();
+                      },
+                      isLoading: false)),
+                  commonHorizontalSpacing(),
+                  Expanded(child: commonFillButtonView(
+                      context: context,
+                      title: "Save",
+                      height: 50,
+                      tapOnButton: () {
+                        CandidateController.to.editAttachmentsInfo(
+                          coverLetter: coverLetterImage,
+                          resume: resumeImage,
+                          otherAttachments: otherAttachmentsImages!,
+                          callback: (){
+                            getListOfAttachments();
+                            isEdit = false;
+                          }
+                        );
+                      },
+                      isLoading: false)
+                  )
+                ],
+              )
+          ),
+        ) : Container(height: 0),
+        child: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView(
           shrinkWrap: true,
@@ -198,21 +273,20 @@ class _AttachmentsViewState extends State<AttachmentsView> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 commonHeaderTitle(title: "Attachment Information", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 4),
-                commonFillButtonView(
+                !isEdit ? commonFillButtonView(
                     context: context,
-                    title: "SAVE",
+                    title: "Edit",
                     width: 70,
                     height: 35,
                     tapOnButton: () {
-                      // CandidateController.to.editAttachmentsInfo(
-                      //   coverLetter:
-                      // );
+                      setState(() {
+                        isEdit = true;
+                      });
                     },
-                    isLoading: false
-                )
+                    isLoading: false) : Container()
               ],
             ),
-            commonVerticalSpacing(),
+            commonVerticalSpacing(spacing: 20),
             imageView(title: "Resume", onChanged: (File file){
               setState(() {
                 resumeImage = file;

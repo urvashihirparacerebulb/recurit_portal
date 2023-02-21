@@ -1,12 +1,14 @@
-
+import 'package:cerebulb_recruit_portal/models/address_model.dart';
 import 'package:flutter/material.dart';
 
-import '../common_textfields/common_bottom_string_view.dart';
+import '../common_textfields/address_bottom_view.dart';
 import '../common_widgets/common_textfield.dart';
 import '../common_widgets/common_widgets_view.dart';
+import '../controllers/address_controller.dart';
 import '../controllers/candidate_controller.dart';
 import '../utility/constants.dart';
 import '../utility/screen_utility.dart';
+import 'add_pincode_view.dart';
 
 class AddressView extends StatefulWidget {
   const AddressView({Key? key}) : super(key: key);
@@ -23,7 +25,10 @@ class _AddressViewState extends State<AddressView> {
   TextEditingController cityController = TextEditingController();
   TextEditingController stateController = TextEditingController();
   TextEditingController countryController = TextEditingController();
-  String selectedZipcode = "";
+  CountryState? selectedZipcode;
+  CountryState? selectedCountry;
+  CountryState? selectedState;
+  CountryState? selectedCity;
   bool isAddressSame = false;
 
   TextEditingController correspondenceHouseNumController = TextEditingController();
@@ -32,31 +37,49 @@ class _AddressViewState extends State<AddressView> {
   TextEditingController correspondenceCityController = TextEditingController();
   TextEditingController correspondenceStateController = TextEditingController();
   TextEditingController correspondenceCountryController = TextEditingController();
-  String correspondenceSelectedZipcode = "";
+  CountryState? correspondenceSelectedZipcode;
+  CountryState? correspondenceSelectedCountry;
+  CountryState? correspondenceSelectedState;
+  CountryState? correspondenceSelectedCity;
   bool isEdit = false;
 
   @override
   void initState() {
     CandidateController.to.getCandidateAddressInfo(callback: (){
       var val = CandidateController.to.candidateDetail.value;
-      houseNumController.text = val.blockHouseNo ?? "";
-      streetLocalityController.text = val.streetLocality ?? "";
-      landmarkController.text = val.landmark ?? "";
-      countryController.text = val.countryName ?? "";
-      stateController.text = val.stateName ?? "";
-      cityController.text = val.cityName ?? "";
+      AddressController.to.getPinCodesList(callback: (){
+        AddressController.to.getCountriesList(callback: (){
+          selectedCountry = AddressController.to.countriesList.where((p0) => p0.name == "India").toList().first;
+          correspondenceSelectedCountry = selectedCountry;
+          AddressController.to.getStatesList(countryId: selectedCountry?.id.toString(),callback: (){
+            selectedState = AddressController.to.statesList.where((p0) => p0.name == "Gujarat").toList().first;
+            correspondenceSelectedState = selectedState;
+            AddressController.to.getCitiesList(stateId: selectedState?.id.toString(),callback: (){
+              selectedCity = AddressController.to.citiesList.where((p0) => p0.name == "Gandhinagar").toList().first;
+              correspondenceSelectedCity = selectedCity;
 
-      if(val.sameCorrespondenceAddress == 1){
-        isAddressSame = true;
-      }
-      correspondenceHouseNumController.text = val.cblockHouseNo ?? "";
-      correspondenceStreetLocalityController.text = val.cstreet ?? "";
-      correspondenceLandmarkController.text = val.clandmark ?? "";
-      correspondenceCountryController.text = val.correspondenceCountryName ?? "";
-      correspondenceStateController.text = val.correspondenceStateName ?? "";
-      correspondenceCityController.text = val.correspondenceCityName ?? "";
+              houseNumController.text = val.blockHouseNo ?? "";
+              streetLocalityController.text = val.streetLocality ?? "";
+              landmarkController.text = val.landmark ?? "";
+              countryController.text = selectedCountry?.name ?? "";
+              stateController.text = selectedState?.name ?? "";
+              cityController.text = selectedCity?.name ?? "";
 
-      setState(() {});
+              if(val.sameCorrespondenceAddress == 1){
+                isAddressSame = true;
+              }
+              correspondenceHouseNumController.text = val.cblockHouseNo ?? "";
+              correspondenceStreetLocalityController.text = val.cstreet ?? "";
+              correspondenceLandmarkController.text = val.clandmark ?? "";
+              correspondenceCountryController.text = correspondenceSelectedCountry?.name ?? "";
+              correspondenceStateController.text = correspondenceSelectedState?.name ?? "";
+              correspondenceCityController.text = correspondenceSelectedCity?.name ?? "";
+
+              setState(() {});
+            });
+          });
+        });
+      });
     });
     super.initState();
   }
@@ -132,49 +155,47 @@ class _AddressViewState extends State<AddressView> {
                 onTap: (){
                   if(isEdit) {
                     commonBottomView(context: context,
-                        child: CommonBottomStringView(
-                            hintText: "Zip/Postal Code *",
-                            myItems: const [
-                              "382355",
-                              "201301",
-                              "382908",
-                              "263030",
-                              "382350",
-                              "382481",
-                              "382620",
-                              "360006",
-                              "382421",
-                              "380013",
-                              "382721",
-                              "380061",
-                              "382030",
-                              "380005",
-                              "380048",
-                              "382735",
-                              "380058",
-                              "380019",
-                              "411048",
-                              "394107"
-                            ],
-                            selectionCallBack: (String val) {
+                        child: AddressBottomView(
+                            title: "Zip/Postal Code *",
+                            myItems: AddressController.to.pinCodesList.value,
+                            selectionCallBack: (CountryState val) {
                               setState(() {
                                 selectedZipcode = val;
                               });
                             }));
                   }
                 },
-                child: commonDecoratedTextView(
-                    bottom: 10,
-                    title: selectedZipcode == "" ? "Select Pin Code" : selectedZipcode,
-                    isChangeColor: selectedZipcode == "" ? true : false
+                child: Row(
+                  children: [
+                    Expanded(child: commonDecoratedTextView(
+                        bottom: 10,
+                        title: selectedZipcode == null ? "Select Pin Code" : selectedZipcode!.pinCodeNo ?? "",
+                        isChangeColor: selectedZipcode == null ? true : false
+                    )),
+                    commonHorizontalSpacing(),
+                    Padding(padding: const EdgeInsets.only(bottom: 8),
+                      child: commonFillButtonView(
+                          context: context,
+                          title: "New Pincode",
+                          width: 120, height: 40,
+                          tapOnButton: () {
+                            showDialog(context: context, builder: (BuildContext context) => AddPinCodeView(doneCallback: (CountryState countryState, String pin){
+                              AddressController.to.addNewPinCode(
+                                cityId: selectedCity?.id,
+                                pinCode: pin
+                              );
+                            }));
+                          }, isLoading: false
+                      ),
+                    )
+                  ],
                 ),
               ),
-
               CommonTextFiled(
-                  fieldTitleText: "City",
-                  hintText: "City",
-                  isEnabled: isEdit,
-                  textEditingController: cityController,
+                  fieldTitleText: "Country",
+                  hintText: "Country",
+                  isEnabled: false,
+                  textEditingController: countryController,
                   onChangedFunction: (String value){
                   },
                   validationFunction: (String value) {
@@ -182,12 +203,11 @@ class _AddressViewState extends State<AddressView> {
                         ? notEmptyFieldMessage
                         : null;
                   }),
-
               commonVerticalSpacing(),
               CommonTextFiled(
                   fieldTitleText: "State/Province",
                   hintText: "State/Province",
-                  isEnabled: isEdit,
+                  isEnabled: false,
                   textEditingController: stateController,
                   onChangedFunction: (String value){
                   },
@@ -199,10 +219,10 @@ class _AddressViewState extends State<AddressView> {
 
               commonVerticalSpacing(),
               CommonTextFiled(
-                  fieldTitleText: "Country",
-                  hintText: "Country",
-                  isEnabled: isEdit,
-                  textEditingController: countryController,
+                  fieldTitleText: "City",
+                  hintText: "City",
+                  isEnabled: false,
+                  textEditingController: cityController,
                   onChangedFunction: (String value){
                   },
                   validationFunction: (String value) {
@@ -263,75 +283,42 @@ class _AddressViewState extends State<AddressView> {
                 onTap: (){
                   if(isEdit) {
                     commonBottomView(context: context,
-                        child: CommonBottomStringView(
-                            hintText: "Zip/Postal Code *",
-                            myItems: const [
-                              "382355",
-                              "201301",
-                              "382908",
-                              "263030",
-                              "382350",
-                              "382481",
-                              "382620",
-                              "360006",
-                              "382421",
-                              "380013",
-                              "382721",
-                              "380061",
-                              "382030",
-                              "380005",
-                              "380048",
-                              "382735",
-                              "380058",
-                              "380019",
-                              "411048",
-                              "394107"
-                            ],
-                            selectionCallBack: (String val) {
+                        child: AddressBottomView(
+                            title: "Zip/Postal Code *",
+                            myItems: AddressController.to.pinCodesList,
+                            selectionCallBack: (CountryState val) {
                               setState(() {
                                 correspondenceSelectedZipcode = val;
                               });
-                            }));
+                            })
+                    );
                   }
                 },
-                child: commonDecoratedTextView(
-                    bottom: 10,
-                    title: correspondenceSelectedZipcode == "" ? "Select Pin Code" : correspondenceSelectedZipcode,
-                    isChangeColor: correspondenceSelectedZipcode == "" ? true : false
+                child: Row(
+                  children: [
+                    Expanded(child: commonDecoratedTextView(
+                        bottom: 10,
+                        title: correspondenceSelectedZipcode == null ? "Select Pin Code" : correspondenceSelectedZipcode!.pinCodeNo ?? "",
+                        isChangeColor: correspondenceSelectedZipcode == null ? true : false
+                    )),
+                    commonHorizontalSpacing(),
+                    Padding(padding: const EdgeInsets.only(bottom: 8),
+                      child: commonFillButtonView(
+                          context: context,
+                          title: "New Pincode",
+                          width: 120, height: 40,
+                          tapOnButton: () {
+
+                          }, isLoading: false
+                      ),
+                    )
+                  ],
                 ),
               ),
               CommonTextFiled(
-                  fieldTitleText: "City",
-                  hintText: "City",
-                  isEnabled: isEdit,
-                  textEditingController: correspondenceCityController,
-                  onChangedFunction: (String value){
-                  },
-                  validationFunction: (String value) {
-                    return value.toString().isEmpty
-                        ? notEmptyFieldMessage
-                        : null;
-                  }),
-
-              commonVerticalSpacing(),
-              CommonTextFiled(
-                  fieldTitleText: "State/Province",
-                  hintText: "State/Province",
-                  isEnabled: isEdit,
-                  textEditingController: correspondenceStateController,
-                  onChangedFunction: (String value){
-                  },
-                  validationFunction: (String value) {
-                    return value.toString().isEmpty
-                        ? notEmptyFieldMessage
-                        : null;
-                  }),
-
-              commonVerticalSpacing(),
-              CommonTextFiled(
                   fieldTitleText: "Country",
                   hintText: "Country",
-                  isEnabled: isEdit,
+                  isEnabled: false,
                   textEditingController: correspondenceCountryController,
                   onChangedFunction: (String value){
                   },
@@ -340,6 +327,34 @@ class _AddressViewState extends State<AddressView> {
                         ? notEmptyFieldMessage
                         : null;
                   }),
+              commonVerticalSpacing(),
+              CommonTextFiled(
+                  fieldTitleText: "State/Province",
+                  hintText: "State/Province",
+                  isEnabled: false,
+                  textEditingController: correspondenceStateController,
+                  onChangedFunction: (String value){
+                  },
+                  validationFunction: (String value) {
+                    return value.toString().isEmpty
+                        ? notEmptyFieldMessage
+                        : null;
+                  }),
+              commonVerticalSpacing(),
+              CommonTextFiled(
+                  fieldTitleText: "City",
+                  hintText: "City",
+                  isEnabled: false,
+                  textEditingController: correspondenceCityController,
+                  onChangedFunction: (String value){
+                  },
+                  validationFunction: (String value) {
+                    return value.toString().isEmpty
+                        ? notEmptyFieldMessage
+                        : null;
+                  }),
+              commonVerticalSpacing(),
+
             ],
           ),
         )

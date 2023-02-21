@@ -69,7 +69,7 @@ class CandidateController extends GetxController {
   void getCandidateAddressInfo({Function? callback}) {
     apiServiceCall(
         params: {
-          "manage_user_id": 4,
+          "manage_user_id": getLoginData()!.data?.manageUserId,
           "candidate_id": candidateId.value
         },
         serviceUrl: ApiConfig.fetchAddressURL,
@@ -89,7 +89,7 @@ class CandidateController extends GetxController {
   void getCandidateCompensationInfo({Function? callback}) {
     apiServiceCall(
         params: {
-          "manage_user_id": 4,
+          "manage_user_id": getLoginData()!.data?.manageUserId,
           "candidate_id": candidateId.value
         },
         serviceUrl: ApiConfig.fetchCandidateCompensationURL,
@@ -109,7 +109,7 @@ class CandidateController extends GetxController {
   void getCandidateQuestionaryInfo({Function? callback}) {
     apiServiceCall(
         params: {
-          "manage_user_id": 4,
+          "manage_user_id": getLoginData()!.data?.manageUserId,
           "candidate_id": candidateId.value
         },
         serviceUrl: ApiConfig.fetchQuestionaryURL,
@@ -129,7 +129,7 @@ class CandidateController extends GetxController {
   void getFamilyDetailInfo() {
     apiServiceCall(
         params: {
-          "manage_user_id": 4,
+          "manage_user_id": getLoginData()!.data?.manageUserId,
           "candidate_id": candidateId.value
         },
         serviceUrl: ApiConfig.fetchFamilyDetailURL,
@@ -148,7 +148,7 @@ class CandidateController extends GetxController {
   void getIdentificationInfoList() {
     apiServiceCall(
         params: {
-          "manage_user_id": 4,
+          "manage_user_id": getLoginData()!.data?.manageUserId,
           "candidate_id": candidateId.value
         },
         serviceUrl: ApiConfig.fetchIdentificationListURL,
@@ -168,7 +168,7 @@ class CandidateController extends GetxController {
     certificationList.clear();
     apiServiceCall(
         params: {
-          "manage_user_id": 4,
+          "manage_user_id": getLoginData()!.data?.manageUserId,
           "candidate_id": candidateId.value
         },
         serviceUrl: ApiConfig.fetchCertificationListURL,
@@ -187,7 +187,7 @@ class CandidateController extends GetxController {
   void getIndustryInfo({Function? callback}) {
     apiServiceCall(
         params: {
-          "manage_user_id": 4,
+          "manage_user_id": getLoginData()!.data?.manageUserId,
           "candidate_id": candidateId.value
         },
         serviceUrl: ApiConfig.fetchIndustryURL,
@@ -207,7 +207,7 @@ class CandidateController extends GetxController {
   void getAchievementsInfo() {
     apiServiceCall(
         params: {
-          "manage_user_id": 4,
+          "manage_user_id": getLoginData()!.data?.manageUserId,
           "candidate_id": candidateId.value
         },
         serviceUrl: ApiConfig.fetchAchievementsListURL,
@@ -226,7 +226,7 @@ class CandidateController extends GetxController {
   void getSkillsInfoList() {
     apiServiceCall(
         params: {
-          "manage_user_id": 4,
+          "manage_user_id": getLoginData()!.data?.manageUserId,
           "candidate_id": candidateId.value
         },
         serviceUrl: ApiConfig.fetchSkillsURL,
@@ -245,7 +245,7 @@ class CandidateController extends GetxController {
   void getReferencesList() {
     apiServiceCall(
         params: {
-          "manage_user_id": 4,
+          "manage_user_id": getLoginData()!.data?.manageUserId,
           "candidate_id": candidateId.value
         },
         serviceUrl: ApiConfig.fetchReferencesURL,
@@ -264,7 +264,7 @@ class CandidateController extends GetxController {
   void getLanguagesList() {
     apiServiceCall(
         params: {
-          "manage_user_id": 4,
+          "manage_user_id": getLoginData()!.data?.manageUserId,
           "candidate_id": candidateId.value
         },
         serviceUrl: ApiConfig.fetchLanguageInfoURL,
@@ -283,7 +283,7 @@ class CandidateController extends GetxController {
   void getQualificationsList() {
     apiServiceCall(
         params: {
-          "manage_user_id": 4,
+          "manage_user_id": getLoginData()!.data?.manageUserId,
           "candidate_id": candidateId.value
         },
         serviceUrl: ApiConfig.fetchQualificationURL,
@@ -302,7 +302,7 @@ class CandidateController extends GetxController {
   void getExperiencesList() {
     apiServiceCall(
         params: {
-          "manage_user_id": 4,
+          "manage_user_id": getLoginData()!.data?.manageUserId,
           "candidate_id": candidateId.value
         },
         serviceUrl: ApiConfig.fetchExperienceURL,
@@ -325,9 +325,11 @@ class CandidateController extends GetxController {
         },
         serviceUrl: ApiConfig.fetchAttachmentURL,
         success: (dio.Response<dynamic> response) {
-          AttachmentsResponse attachmentsResponse = AttachmentsResponse.fromJson(jsonDecode(response.data));
-          attachmentDetail.value = attachmentsResponse.data!.first;
-          callback!();
+          AttachmentsResponseModel attachmentsResponse = AttachmentsResponseModel.fromJson(jsonDecode(response.data));
+          if(attachmentsResponse.data!.data != null) {
+            attachmentDetail.value = attachmentsResponse.data!.data!.first;
+            callback!();
+          }
         },
         error: (dio.Response<dynamic> response) {
           errorHandling(response);
@@ -1035,7 +1037,7 @@ class CandidateController extends GetxController {
 
   Future<void> editAttachmentsInfo({File? coverLetter,
     File? resume,
-    List<File> otherAttachments = const [],
+    List<ImageModel> otherAttachments = const [],
     Function? callback}) async {
     dio.FormData formData = dio.FormData.fromMap({
       "status": "Active",
@@ -1056,16 +1058,91 @@ class CandidateController extends GetxController {
 
     if(otherAttachments.isNotEmpty){
       for(int i = 0; i < otherAttachments.length; i++){
-        formData.files.add(
-            MapEntry("other_attachment[$i]", await dio
-                .MultipartFile.fromFile(otherAttachments[i].path)));
+        if(otherAttachments[i].filename == "" && otherAttachments[i].link == "") {
+          formData.files.add(
+              MapEntry("other_attachment[$i]", await dio
+                  .MultipartFile.fromFile(otherAttachments[i].filePath!.path)));
+        }
       }
     }
 
     apiServiceCall(
         params: {},
         formValues: formData,
-        serviceUrl: ApiConfig.updateAttachmentURL,
+        serviceUrl: ApiConfig.updateAttachmentURL + candidateId.value,
+        success: (dio.Response<dynamic> response) {
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
+
+  void deleteOtherAttachment({String docName = "", Function? callback}) {
+    apiServiceCall(
+        params: {
+          "candidate_id": candidateId.value,
+          "filename": docName
+        },
+        serviceUrl: ApiConfig.deleteOtherAttachmentURL,
+        success: (dio.Response<dynamic> response) {
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
+  void deleteOtherAttachmentsForExperience({String docName = "", expId,Function? callback}) {
+    apiServiceCall(
+        params: {
+          "experience_id": expId,
+          "filename": docName
+        },
+        serviceUrl: ApiConfig.deleteOtherAttachmentExperienceURL,
+        success: (dio.Response<dynamic> response) {
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
+  void deleteSalarySlipsExperience({String docName = "", expId,Function? callback}) {
+    apiServiceCall(
+        params: {
+          "experience_id": expId,
+          "filename": docName
+        },
+        serviceUrl: ApiConfig.deleteSalarySlipsExperienceURL,
+        success: (dio.Response<dynamic> response) {
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
+
+  void deleteMarkSheetsInQualification({String docName = "", qulId,Function? callback}) {
+    apiServiceCall(
+        params: {
+          "qualification_id": qulId,
+          "filename": docName
+        },
+        serviceUrl: ApiConfig.deleteMarkSheetURL,
         success: (dio.Response<dynamic> response) {
           callback!();
         },

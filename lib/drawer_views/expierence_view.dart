@@ -11,6 +11,7 @@ import '../common_widgets/common_widgets_view.dart';
 import '../controllers/candidate_controller.dart';
 import '../theme/convert_theme_colors.dart';
 import '../utility/color_utility.dart';
+import '../utility/common_methods.dart';
 import '../utility/constants.dart';
 import '../utility/delete_dialog_view.dart';
 import '../utility/screen_utility.dart';
@@ -118,7 +119,7 @@ class _ExpierenceViewState extends State<ExpierenceView> {
 
   multipleImageView({String title = "", Function? onChanged}) {
     return SizedBox(
-      height: 80,
+      height: title == "Salary Slips" ? salarySlipsImages!.isNotEmpty ? 180 : 80 : otherAttachmentsImages!.isNotEmpty ? 180 : 80,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -176,8 +177,46 @@ class _ExpierenceViewState extends State<ExpierenceView> {
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) {
               if((title == "Salary Slips" ? salarySlipsImages![index].filePath : otherAttachmentsImages![index].filePath) == null){
-                return GetUtils.isPDF(title == "Salary Slips" ? salarySlipsImages![index].link ?? "" : otherAttachmentsImages![index].link ?? "") ?
-                const Icon(Icons.picture_as_pdf_outlined,color: dangerColor,size: 100,) : Image.network(title == "Salary Slips" ? salarySlipsImages![index].link ?? "" : otherAttachmentsImages![index].link ?? "", height: 100);
+                return Row(
+                  children: [
+                    InkWell(
+                      onTap: (){
+                        launchInBrowser(title == "Salary Slips" ? salarySlipsImages![index].link ?? "" : otherAttachmentsImages![index].link ?? "");
+                      },
+                      child: GetUtils.isPDF(title == "Salary Slips" ? salarySlipsImages![index].link ?? "" :
+                        otherAttachmentsImages![index].link ?? "") ?
+                        const Icon(Icons.picture_as_pdf_outlined,color: dangerColor,size: 100,) :
+                        Image.network(title == "Salary Slips" ? salarySlipsImages![index].link ?? "" :
+                        otherAttachmentsImages![index].link ?? "", height: 100),
+                    ),
+                    commonHorizontalSpacing(spacing: 20),
+                    InkWell(
+                      onTap: (){
+                        if(title == "Salary Slips") {
+                          CandidateController.to.deleteOtherAttachmentsForExperience(
+                              expId: selectedExperience?.id,
+                              docName: salarySlipsImages![index]
+                                  .filename ?? "",
+                              callback: () {
+                                CandidateController.to.getExperiencesList();
+                              }
+                          );
+                        }else{
+                          CandidateController.to.deleteSalarySlipsExperience(
+                              expId: selectedExperience?.id,
+                              docName: otherAttachmentsImages![index]
+                                  .filename ?? "",
+                              callback: () {
+                                CandidateController.to.getExperiencesList();
+                              }
+                          );
+                        }
+                      },
+                      child: const Icon(Icons.delete_forever_outlined, color: dangerColor),
+                    ),
+                    commonHorizontalSpacing(spacing: 20),
+                  ],
+                );
               }
               return Image.file(title == "Salary Slips" ? salarySlipsImages![index].filePath! : otherAttachmentsImages![index].filePath!, height: 100);
             },
@@ -215,10 +254,18 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                       durationTo = experience.toMonths ?? "";
                       isCurrentlyWorkingHere = experience.currentlyWorking != null ? experience.currentlyWorking == "Yes" ? true : false : false;
                       if(experience.salarySlip!.isNotEmpty){
-                        salarySlipsImages!.addAll(experience.salarySlip ?? []);
+                        experience.salarySlip?.forEach((element) {
+                          if((element.link != null || element.filename != "")){
+                            salarySlipsImages!.add(element);
+                          }
+                        });
                       }
                       if(experience.otherAttachement!.isNotEmpty){
-                        otherAttachmentsImages!.addAll(experience.otherAttachement ?? []);
+                        experience.otherAttachement?.forEach((element) {
+                          if((element.link != null || element.filename != "")){
+                            otherAttachmentsImages!.add(element);
+                          }
+                        });
                       }
                     });
                   },
