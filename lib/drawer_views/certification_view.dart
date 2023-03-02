@@ -4,9 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../common_widgets/common_textfield.dart';
 import '../common_widgets/common_widgets_view.dart';
+import '../configurations/api_service.dart';
+import '../configurations/api_utility.dart';
 import '../controllers/candidate_controller.dart';
 import '../theme/convert_theme_colors.dart';
 import '../utility/color_utility.dart';
@@ -158,14 +161,19 @@ class _CertificationViewState extends State<CertificationView> {
           PopupMenuItem<String>(
               value: 'Download',
               child: InkWell(
-                  onTap: (){
+                  onTap: () async {
                     Get.back();
+                    var tempDir = await getTemporaryDirectory();
+                    String fullPath = tempDir.path;
+                    if(certification.attachment != null && certification.attachment!.isNotEmpty){
+                      download2(APIProvider.getDio(), certification.attachment ?? "", fullPath);
+                    }
                   },
                   child: Row(
                     children: [
                       const Icon(Icons.download),
                       commonHorizontalSpacing(),
-                      const Text('Download'),
+                      const Text('Download')
                     ],
                   )
               ))
@@ -199,6 +207,7 @@ class _CertificationViewState extends State<CertificationView> {
                             credURL: credURLController.text,
                             expireMonth: expirationDate,
                             issueMonth: issueDate,
+                            isNotExpire: isCredNotExpire,
                             issuingOrg: issuingOrgController.text,
                             attachment: attachmentImage,
                             isEdit: isEdit,
@@ -206,8 +215,10 @@ class _CertificationViewState extends State<CertificationView> {
                             status: selectedCertification != null ? selectedCertification!.status : "Active",
                             callback: (){
                               CandidateController.to.getCertificationInfoList();
-                              isAdd = false;
-                              isEdit = false;
+                              setState(() {
+                                isAdd = false;
+                                isEdit = false;
+                              });
                             }
                         );
                       },
@@ -249,7 +260,7 @@ class _CertificationViewState extends State<CertificationView> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             commonHeaderTitle(title: e.issueMonth ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                            commonHeaderTitle(title: e.expireMonth ?? "-", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                            commonHeaderTitle(title: (e.doesNotExpire != null && e.doesNotExpire?.toLowerCase() == "yes") ? " | Credential Not Expire" :  e.expireMonth ?? "-", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
                           ],
                         ),
                         commonVerticalSpacing(),
@@ -328,11 +339,16 @@ class _CertificationViewState extends State<CertificationView> {
                       commonHorizontalSpacing(spacing: 10),
                       Expanded(child: InkWell(
                         onTap: (){
-                          showDialog(context: context, barrierDismissible: false,builder: (BuildContext context) => monthSelectionView(callback: (String val){
-                            setState(() {
-                              expirationDate = val;
-                            });
-                          }));
+                          if(!isCredNotExpire) {
+                            showDialog(context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext context) =>
+                                    monthSelectionView(callback: (String val) {
+                                      setState(() {
+                                        expirationDate = val;
+                                      });
+                                    }));
+                          }
                         },
                         child: Container(
                           padding: const EdgeInsets.all(18),

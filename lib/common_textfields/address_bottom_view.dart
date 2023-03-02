@@ -31,7 +31,6 @@ class _AddressBottomViewState extends State<AddressBottomView> {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: ListView(
         shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
         children: [
           commonVerticalSpacing(spacing: 15),
           commonHeaderTitle(title: widget.title,fontWeight: 2,fontSize: 1.5),
@@ -56,6 +55,7 @@ class _AddressBottomViewState extends State<AddressBottomView> {
           ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: searchedItems.length,
               itemBuilder: (context, index) => InkWell(
                 onTap: (){

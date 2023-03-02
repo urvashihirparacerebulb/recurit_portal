@@ -5,9 +5,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../common_widgets/common_textfield.dart';
 import '../common_widgets/common_widgets_view.dart';
+import '../configurations/api_service.dart';
+import '../configurations/api_utility.dart';
 import '../controllers/candidate_controller.dart';
 import '../theme/convert_theme_colors.dart';
 import '../utility/color_utility.dart';
@@ -153,8 +156,13 @@ class _AchievementsViewState extends State<AchievementsView> {
           PopupMenuItem<String>(
               value: 'Download',
               child: InkWell(
-                  onTap: (){
+                  onTap: () async {
                     Get.back();
+                    var tempDir = await getTemporaryDirectory();
+                    String fullPath = tempDir.path;
+                    if(achievement.attachment != null && achievement.attachment!.isNotEmpty){
+                      download2(APIProvider.getDio(), achievement.attachment ?? "", fullPath);
+                    }
                   },
                   child: Row(
                     children: [

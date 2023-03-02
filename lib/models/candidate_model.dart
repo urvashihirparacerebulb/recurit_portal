@@ -154,11 +154,13 @@ class CandidateDetail {
     this.countryId,
     this.countryName,
     this.pincodeId,
+    this.pinCodeNo,
     this.sameCorrespondenceAddress,
     this.cblockHouseNo,
     this.cstreet,
     this.clandmark,
     this.cpincode,
+    this.cPinCodeNo,
     this.correspondenceStateId,
     this.correspondenceStateName,
     this.correspondenceCityId,
@@ -203,18 +205,19 @@ class CandidateDetail {
   int? countryId;
   String? countryName;
   int? pincodeId;
+  String? pinCodeNo;
   int? sameCorrespondenceAddress;
   String? cblockHouseNo;
   String? cstreet;
   String? clandmark;
   int? cpincode;
+  String? cPinCodeNo;
   int? correspondenceStateId;
   String? correspondenceStateName;
   int? correspondenceCityId;
   String? correspondenceCityName;
   int? correspondenceCountryId;
   String? correspondenceCountryName;
-
   String? currentCtc;
   String? expectedCtc;
   String? negotiable;
@@ -253,11 +256,13 @@ class CandidateDetail {
     countryId: json["country_id"],
     countryName: json["country_name"],
     pincodeId: json["pincode_id"],
+    pinCodeNo: json["pincode_no"],
     sameCorrespondenceAddress: json["same_correspondence_address"],
     cblockHouseNo: json["cblock_house_no"],
     cstreet: json["cstreet"],
     clandmark: json["clandmark"],
-    cpincode: json["cpincode"],
+    cpincode: json["cpincode_id"],
+    cPinCodeNo: json["cpincode_no"],
     correspondenceStateId: json["correspondence_state_id"],
     correspondenceStateName: json["correspondence_state_name"],
     correspondenceCityId: json["correspondence_city_id"],

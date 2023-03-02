@@ -161,10 +161,11 @@ Widget commonBorderButtonView(
       required bool isLoading,
       Color? color,
       double height = 50,
+      double? width,
       IconData? iconData}) {
   return Container(
     decoration: neurmorphicBoxDecoration,
-    width: MediaQuery.of(context).size.width - (commonHorizontalPadding * 2),
+    width: width ?? MediaQuery.of(context).size.width - (commonHorizontalPadding * 2),
     height: height,
     child: ElevatedButton(
       onPressed: () {
@@ -285,6 +286,7 @@ PreferredSize commonAppbar({BuildContext? context,
   String title = "",
   bool isLeadingCCustom = false,
   Widget? leadingWidget,
+  List<Widget>? actionsWidgets,
   bool centerTitle = false}){
   return PreferredSize(
     preferredSize: const Size.fromHeight(56.0),
@@ -302,7 +304,7 @@ PreferredSize commonAppbar({BuildContext? context,
               Get.back();
             },
             child: Container()
-        )
+        ),actions: actionsWidgets ?? [],
       );
     }),
   );

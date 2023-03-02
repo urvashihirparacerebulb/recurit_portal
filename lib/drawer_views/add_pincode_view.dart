@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../common_textfields/address_bottom_view.dart';
@@ -11,7 +12,9 @@ import '../utility/constants.dart';
 
 class AddPinCodeView extends StatefulWidget {
   final Function doneCallback;
-  const AddPinCodeView({Key? key, required this.doneCallback}) : super(key: key);
+  final String country;
+  final String state;
+  const AddPinCodeView({Key? key, required this.doneCallback, required this.country, required this.state}) : super(key: key);
 
   @override
   State<AddPinCodeView> createState() => _AddPinCodeViewState();
@@ -23,6 +26,19 @@ class _AddPinCodeViewState extends State<AddPinCodeView> {
   TextEditingController countryController = TextEditingController();
   TextEditingController pinCodeController = TextEditingController();
   CountryState? selectedCity;
+
+  @override
+  void initState() {
+    setInitialData();
+    super.initState();
+  }
+
+  setInitialData(){
+    setState(() {
+      countryController.text = widget.country;
+      stateController.text = widget.state;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,10 +69,11 @@ class _AddPinCodeViewState extends State<AddPinCodeView> {
             ]),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: ListView(
+            shrinkWrap: true,
+            // mainAxisSize: MainAxisSize.min,
+            // crossAxisAlignment: CrossAxisAlignment.center,
+            // mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               CommonTextFiled(
                   fieldTitleText: "Country",
@@ -95,7 +112,8 @@ class _AddPinCodeViewState extends State<AddPinCodeView> {
                               setState(() {
                                 selectedCity = val;
                               });
-                            }));
+                            })
+                    );
                 },
                 child: commonDecoratedTextView(
                     bottom: 10,
@@ -108,6 +126,10 @@ class _AddPinCodeViewState extends State<AddPinCodeView> {
                   fieldTitleText: "Zip/Postal Code",
                   hintText: "Zip/Postal Code",
                   textEditingController: pinCodeController,
+                  inputFormatter: [
+                    LengthLimitingTextInputFormatter(6),
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
                   onChangedFunction: (String value){
                   },
                   validationFunction: (String value) {

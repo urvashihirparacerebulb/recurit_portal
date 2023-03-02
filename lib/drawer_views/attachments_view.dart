@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cerebulb_recruit_portal/models/candidate_model.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -69,17 +70,35 @@ class _AttachmentsViewState extends State<AttachmentsView> {
               children: [
                 InkWell(
                     onTap: () async {
-                      final ImagePicker picker = ImagePicker();
-                      try {
-                        final XFile? pickedFile = await picker.pickImage(
-                          source: ImageSource.gallery,
-                        );
-                        setState(() {
-                          onChanged!(File(pickedFile!.path));
-                        });
-                      } catch (e) {
-                        if (kDebugMode) {
-                          print(e);
+                      if(title == "Resume" && selectedAttachment?.resume == null) {
+                        final ImagePicker picker = ImagePicker();
+                        try {
+                          final XFile? pickedFile = await picker.pickImage(
+                            source: ImageSource.gallery,
+                          );
+                          setState(() {
+                            onChanged!(File(pickedFile!.path));
+                          });
+                        } catch (e) {
+                          if (kDebugMode) {
+                            print(e);
+                          }
+                        }
+                      }else{
+                        if(selectedAttachment?.coverLetter == null){
+                          final ImagePicker picker = ImagePicker();
+                          try {
+                            final XFile? pickedFile = await picker.pickImage(
+                              source: ImageSource.gallery,
+                            );
+                            setState(() {
+                              onChanged!(File(pickedFile!.path));
+                            });
+                          } catch (e) {
+                            if (kDebugMode) {
+                              print(e);
+                            }
+                          }
                         }
                       }
                     },
@@ -92,19 +111,18 @@ class _AttachmentsViewState extends State<AttachmentsView> {
                 commonHorizontalSpacing(spacing: 10),
                 Container(height: 40, width: 1, color: fontColor),
                 commonHorizontalSpacing(spacing: 10),
-                selectedFile == null ? commonHeaderTitle(
-                    title: "No File Chosen",
-                    color: blackColor.withOpacity(0.4),
-                    isChangeColor: true
-                ) : Expanded(child: (selectedAttachment != null) ?
-                (title == "Resume" ? selectedAttachment!.resume == null :
-                selectedAttachment!.coverLetter == null) ? commonHeaderTitle(
+                Expanded(child: (selectedAttachment != null) ?
+                (title == "Resume" ? (selectedAttachment!.resume == null) :
+                (selectedAttachment!.coverLetter == null)) ? commonHeaderTitle(
                     title: "No File Chosen",
                     color: blackColor.withOpacity(0.4),
                     isChangeColor: true
                 ) : Image.network((title == "Resume" ? (selectedAttachment!.resume ?? "") :
-                (selectedAttachment!.coverLetter ?? "")), height: 100) :
-                Image.file(selectedFile, height: 100)
+                (selectedAttachment!.coverLetter ?? "")), height: 100) : selectedFile == null ? commonHeaderTitle(
+                    title: "No File Chosen",
+                    color: blackColor.withOpacity(0.4),
+                    isChangeColor: true
+                ) : Image.file(selectedFile, height: 100)
                 )
               ],
             ),
@@ -136,18 +154,16 @@ class _AttachmentsViewState extends State<AttachmentsView> {
               children: [
                 InkWell(
                     onTap: () async {
-                      final ImagePicker picker = ImagePicker();
-                      try {
-                        final XFile? pickedFile = await picker.pickImage(
-                          source: ImageSource.gallery,
-                        );
-                        setState(() {
-                          onChanged!(File(pickedFile!.path));
-                        });
-                      } catch (e) {
-                        if (kDebugMode) {
-                          print(e);
-                        }
+                      FilePickerResult? result =
+                      await FilePicker.platform.pickFiles(allowMultiple: true,
+                          type: FileType.custom,
+                          allowedExtensions: ["pdf", "docx","jpg","jpeg","png","exe"]
+                      );
+
+                      if (result != null) {
+                        List<File?> files = result.paths.map((path) => File(path!)).toList();
+                        onChanged!(files);
+                      } else {
                       }
                     },
                     child: commonHeaderTitle(
@@ -299,13 +315,15 @@ class _AttachmentsViewState extends State<AttachmentsView> {
               });
             },selectedFile: coverLetterImage),
             commonVerticalSpacing(spacing: 20),
-            multipleImageView(title: "Other attachments", onChanged: (File file){
+            multipleImageView(title: "Other attachments", onChanged: (List<File> filePaths){
               setState(() {
-                ImageModel marksheet = ImageModel();
-                marksheet.filename = "";
-                marksheet.link = "";
-                marksheet.filePath = file;
-                otherAttachmentsImages?.add(marksheet);
+                for (var element in filePaths) {
+                  ImageModel otherAttachment = ImageModel();
+                  otherAttachment.filename = "";
+                  otherAttachment.link = "";
+                  otherAttachment.filePath = element;
+                  otherAttachmentsImages?.add(otherAttachment);
+                }
               });
             }),
             commonVerticalSpacing(spacing: 20),

@@ -22,6 +22,7 @@ class ApiConfig {
   static const String fetchStatesURL = "${baseURL}fetch-state-info";
   static const String fetchCityURL = "${baseURL}fetch-city-info";
   static const String fetchPinCodesURL = "${baseURL}fetch-pincode-info";
+  static const String fetchAddressFromPinURL = "${baseURL}fetch-city-state-country-info";
 
   static const String deleteCertificateURL = "${baseURL}delete-candidate-certification/";
   static const String deleteAchievementURL = "${baseURL}delete-candidate-achievement/";

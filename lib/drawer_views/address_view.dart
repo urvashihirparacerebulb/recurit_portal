@@ -1,5 +1,6 @@
 import 'package:cerebulb_recruit_portal/models/address_model.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../common_textfields/address_bottom_view.dart';
 import '../common_widgets/common_textfield.dart';
@@ -45,10 +46,15 @@ class _AddressViewState extends State<AddressView> {
 
   @override
   void initState() {
+    addressRefresh();
+    super.initState();
+  }
+
+  addressRefresh(){
     CandidateController.to.getCandidateAddressInfo(callback: (){
       var val = CandidateController.to.candidateDetail.value;
-      AddressController.to.getPinCodesList(callback: (){
-        AddressController.to.getCountriesList(callback: (){
+      AddressController.to.getPinCodesList(callback: () {
+        AddressController.to.getCountriesList(callback: () {
           selectedCountry = AddressController.to.countriesList.where((p0) => p0.name == "India").toList().first;
           correspondenceSelectedCountry = selectedCountry;
           AddressController.to.getStatesList(countryId: selectedCountry?.id.toString(),callback: (){
@@ -57,6 +63,16 @@ class _AddressViewState extends State<AddressView> {
             AddressController.to.getCitiesList(stateId: selectedState?.id.toString(),callback: (){
               selectedCity = AddressController.to.citiesList.where((p0) => p0.name == "Gandhinagar").toList().first;
               correspondenceSelectedCity = selectedCity;
+
+              CountryState selectedPin = CountryState();
+              selectedPin.id = val.pincodeId;
+              selectedPin.pinCodeNo = val.pinCodeNo ?? "";
+              selectedZipcode = selectedPin;
+
+              CountryState cSelectedPin = CountryState();
+              cSelectedPin.id = val.pincodeId;
+              cSelectedPin.pinCodeNo = val.pinCodeNo ?? "";
+              correspondenceSelectedZipcode = cSelectedPin;
 
               houseNumController.text = val.blockHouseNo ?? "";
               streetLocalityController.text = val.streetLocality ?? "";
@@ -81,7 +97,6 @@ class _AddressViewState extends State<AddressView> {
         });
       });
     });
-    super.initState();
   }
 
   @override
@@ -96,8 +111,48 @@ class _AddressViewState extends State<AddressView> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  commonHeaderTitle(title: "Basic Details", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 4),
-                  commonFillButtonView(
+                  commonHeaderTitle(title: "Address", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 4),
+                  isEdit ? Row(
+                    children: [
+                      commonFillButtonView(
+                          context: context,
+                          title: "EDIT",
+                          width: 70, height: 35,
+                          tapOnButton: () {
+                            CandidateController.to.updateAddressView(
+                                blockNo: houseNumController.text,
+                                street: streetLocalityController.text,
+                                pinCode: selectedZipcode,
+                                cityId: selectedCity?.id,
+                                stateId: selectedState?.id,
+                                countryId: selectedCountry?.id,
+                                cblockNo: correspondenceHouseNumController.text,
+                                cCity: correspondenceSelectedCity?.id,
+                                cCountry: correspondenceSelectedCountry?.id,
+                                cState: correspondenceSelectedState?.id,
+                                cLandmark: correspondenceLandmarkController.text,
+                                cPinCode: correspondenceSelectedZipcode,
+                                cStreet: correspondenceStreetLocalityController.text,
+                                landmark: landmarkController.text,
+                                sameAddress: isAddressSame,
+                                callback: (){
+                                  addressRefresh();
+                                }
+                            );
+                          }, isLoading: false
+                      ),
+                      commonHorizontalSpacing(),
+                       commonBorderButtonView(
+                           context: context,
+                           title: "Cancel",
+                           height: 35, width: 80,
+                           tapOnButton: () {
+                             Get.back();
+                           },
+                           isLoading: false
+                       )
+                    ],
+                  ) : commonFillButtonView(
                       context: context,
                       title: "EDIT",
                       width: 70, height: 35,
@@ -159,10 +214,35 @@ class _AddressViewState extends State<AddressView> {
                             title: "Zip/Postal Code *",
                             myItems: AddressController.to.pinCodesList.value,
                             selectionCallBack: (CountryState val) {
-                              setState(() {
-                                selectedZipcode = val;
-                              });
-                            }));
+                            AddressController.to.getAddressFromPinCode(
+                              pinCode: val.pinCodeNo ?? "",
+                              callback: (){
+                                for (var element in AddressController.to.addressLists) {
+                                  if(element.pincodeNo == val.pinCodeNo){
+                                    setState(() {
+                                      CountryState country = CountryState();
+                                      country.id = element.countryId ?? 0;
+                                      country.name = element.countryName ?? "";
+                                      selectedCountry = country;
+
+                                      CountryState state = CountryState();
+                                      state.id = element.stateId ?? 0;
+                                      state.name = element.stateName ?? "";
+                                      selectedState = state;
+
+                                      CountryState city = CountryState();
+                                      city.id = element.cityId ?? 0;
+                                      city.name = element.cityName ?? "";
+                                      selectedCity = city;
+
+                                      selectedZipcode = val;
+                                    });
+                                  }
+                                }
+                              }
+                            );
+                        })
+                    );
                   }
                 },
                 child: Row(
@@ -179,10 +259,13 @@ class _AddressViewState extends State<AddressView> {
                           title: "New Pincode",
                           width: 120, height: 40,
                           tapOnButton: () {
-                            showDialog(context: context, builder: (BuildContext context) => AddPinCodeView(doneCallback: (CountryState countryState, String pin){
+                            showDialog(context: context, builder: (BuildContext context) => AddPinCodeView(country: selectedCountry?.name ?? "",state: selectedState?.name ?? "",doneCallback: (CountryState countryState, String pin){
                               AddressController.to.addNewPinCode(
                                 cityId: selectedCity?.id,
-                                pinCode: pin
+                                pinCode: pin,
+                                callback: (){
+                                  AddressController.to.getPinCodesList(callback: (){});
+                                }
                               );
                             }));
                           }, isLoading: false
@@ -272,6 +355,7 @@ class _AddressViewState extends State<AddressView> {
                   isEnabled: isEdit,
                   textEditingController: correspondenceLandmarkController,
                   onChangedFunction: (String value){
+
                   },
                   validationFunction: (String value) {
                     return value.toString().isEmpty
@@ -287,10 +371,35 @@ class _AddressViewState extends State<AddressView> {
                             title: "Zip/Postal Code *",
                             myItems: AddressController.to.pinCodesList,
                             selectionCallBack: (CountryState val) {
-                              setState(() {
-                                correspondenceSelectedZipcode = val;
-                              });
-                            })
+                              AddressController.to.getAddressFromPinCode(
+                                  pinCode: val.pinCodeNo ?? "",
+                                  callback: (){
+                                    for (var element in AddressController.to.addressLists) {
+                                      if(element.pincodeNo == val.pinCodeNo){
+                                        setState(() {
+                                          CountryState country = CountryState();
+                                          country.id = element.countryId ?? 0;
+                                          country.name = element.countryName ?? "";
+                                          correspondenceSelectedCountry = country;
+
+                                          CountryState state = CountryState();
+                                          state.id = element.stateId ?? 0;
+                                          state.name = element.stateName ?? "";
+                                          correspondenceSelectedState = state;
+
+                                          CountryState city = CountryState();
+                                          city.id = element.cityId ?? 0;
+                                          city.name = element.cityName ?? "";
+                                          correspondenceSelectedCity = city;
+
+                                          correspondenceSelectedZipcode = val;
+                                        });
+                                      }
+                                    }
+                                  }
+                              );
+                            }
+                        )
                     );
                   }
                 },
@@ -308,8 +417,17 @@ class _AddressViewState extends State<AddressView> {
                           title: "New Pincode",
                           width: 120, height: 40,
                           tapOnButton: () {
-
-                          }, isLoading: false
+                            showDialog(context: context, builder: (BuildContext context) => AddPinCodeView(country: selectedCountry?.name ?? "",state: selectedState?.name ?? "",doneCallback: (CountryState countryState, String pin){
+                              AddressController.to.addNewPinCode(
+                                  cityId: selectedCity?.id,
+                                  pinCode: pin,
+                                  callback: (){
+                                    AddressController.to.getPinCodesList(callback: (){});
+                                  }
+                              );
+                            }));
+                          },
+                          isLoading: false
                       ),
                     )
                   ],

@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:cerebulb_recruit_portal/common_widgets/common_methods.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' as getx;
 import '../common_widgets/common_widgets_view.dart';
@@ -120,15 +123,22 @@ apiServiceCall({
         if (handleResponse(response)) {
           if (tempIsHandleResponse!) {
             BooleanResponseModel? responseData;
-            if(jsonDecode(response.data.toString()) is String){
-              String decodedString = jsonDecode(response.data.toString());
-              var replacingString = decodedString.replaceAll("\"{", "{");
-              var endString = replacingString.replaceAll('}"', "}");
-              responseData = BooleanResponseModel.fromJson(jsonDecode(endString));
-            }else {
-              responseData = BooleanResponseModel.fromJson(
-                  jsonDecode(response.data.toString()));
+            if(tryDecode(response.data.toString()) != null) {
+              if (jsonDecode(response.data.toString()) is String) {
+                String decodedString = jsonDecode(response.data.toString());
+                var replacingString = decodedString.replaceAll("\"{", "{");
+                var endString = replacingString.replaceAll('}"', "}");
+                responseData =
+                    BooleanResponseModel.fromJson(jsonDecode(endString));
+              } else {
+                responseData = BooleanResponseModel.fromJson(
+                    jsonDecode(response.data.toString()));
+              }
+            }else{
+              responseData =
+                  BooleanResponseModel.fromJson(response.data);
             }
+
             if (tempIsHideLoader!) {
               hideProgressDialog();
             }
@@ -169,6 +179,14 @@ apiServiceCall({
     }
   } else {
     showErrorMessage(message: interNetMessage, isRecall: true);
+  }
+}
+
+dynamic tryDecode(data) {
+  try {
+    return jsonDecode(data);
+  } catch (e) {
+    return null;
   }
 }
 
@@ -229,6 +247,45 @@ showErrorMessage(
         }
       });
 }
+
+Future download2(Dio dio, String url, String savePath) async {
+  showProgressDialog();
+  try {
+    Response response = await dio.get(
+      url,
+      onReceiveProgress: showDownloadProgress,
+      //Received data with List<int>
+      options: Options(
+          responseType: ResponseType.bytes,
+          followRedirects: false,
+          validateStatus: (status) {
+            return status! < 500;
+          }),
+    );
+    if (kDebugMode) {
+      print(response.headers);
+    }
+    File file = File(savePath + savePath.split("/").last);
+    var raf = file.openSync(mode: FileMode.write);
+    // response.data is List<int> type
+    raf.writeFromSync(response.data);
+    await raf.close();
+    hideProgressDialog();
+    showSnackBar(title: ApiConfig.success, message: "Download Successfully");
+  } catch (e) {
+    if (kDebugMode) {
+      print(e);
+    }
+    hideProgressDialog();
+  }
+}
+
+void showDownloadProgress(received, total) {
+  if (total != -1) {
+    print((received / total * 100).toStringAsFixed(0) + "%");
+  }
+}
+
 
 void showProgressDialog() {
   if (tempIsLoading != null) {

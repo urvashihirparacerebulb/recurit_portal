@@ -29,6 +29,7 @@ class CandidateController extends GetxController {
   RxString candidateId = "275".obs;
 
   void getCandidateListData() {
+    candidateList.clear();
     apiServiceCall(
       params: {
         "manage_user_id": getLoginData()!.data?.manageUserId
@@ -127,6 +128,7 @@ class CandidateController extends GetxController {
   }
 
   void getFamilyDetailInfo() {
+    candidateFamilyList.clear();
     apiServiceCall(
         params: {
           "manage_user_id": getLoginData()!.data?.manageUserId,
@@ -146,6 +148,7 @@ class CandidateController extends GetxController {
   }
 
   void getIdentificationInfoList() {
+    identificationList.clear();
     apiServiceCall(
         params: {
           "manage_user_id": getLoginData()!.data?.manageUserId,
@@ -205,6 +208,7 @@ class CandidateController extends GetxController {
   }
 
   void getAchievementsInfo() {
+    candidateAchievementsList.clear();
     apiServiceCall(
         params: {
           "manage_user_id": getLoginData()!.data?.manageUserId,
@@ -224,6 +228,7 @@ class CandidateController extends GetxController {
   }
 
   void getSkillsInfoList() {
+    skillsList.clear();
     apiServiceCall(
         params: {
           "manage_user_id": getLoginData()!.data?.manageUserId,
@@ -243,6 +248,7 @@ class CandidateController extends GetxController {
   }
 
   void getReferencesList() {
+    referencesList.clear();
     apiServiceCall(
         params: {
           "manage_user_id": getLoginData()!.data?.manageUserId,
@@ -262,6 +268,7 @@ class CandidateController extends GetxController {
   }
 
   void getLanguagesList() {
+    languagesList.clear();
     apiServiceCall(
         params: {
           "manage_user_id": getLoginData()!.data?.manageUserId,
@@ -281,6 +288,7 @@ class CandidateController extends GetxController {
   }
 
   void getQualificationsList() {
+    qualificationsList.clear();
     apiServiceCall(
         params: {
           "manage_user_id": getLoginData()!.data?.manageUserId,
@@ -300,6 +308,7 @@ class CandidateController extends GetxController {
   }
 
   void getExperiencesList() {
+    experiencesList.clear();
     apiServiceCall(
         params: {
           "manage_user_id": getLoginData()!.data?.manageUserId,
@@ -344,7 +353,7 @@ class CandidateController extends GetxController {
         params: {},
         serviceUrl: ApiConfig.deleteCertificateURL + certificationId,
         success: (dio.Response<dynamic> response) {
-          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(response.data);
           if(experienceResponseModel.status ?? false){
             getCertificationInfoList();
           }
@@ -362,7 +371,7 @@ class CandidateController extends GetxController {
         params: {},
         serviceUrl: ApiConfig.deleteAchievementURL + achievementId,
         success: (dio.Response<dynamic> response) {
-          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(response.data);
           if(experienceResponseModel.status ?? false){
             getAchievementsInfo();
           }
@@ -380,7 +389,7 @@ class CandidateController extends GetxController {
         params: {},
         serviceUrl: ApiConfig.deleteSkillsURL + skillId,
         success: (dio.Response<dynamic> response) {
-          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(response.data);
           if(experienceResponseModel.status ?? false){
             getSkillsInfoList();
           }
@@ -398,7 +407,7 @@ class CandidateController extends GetxController {
         params: {},
         serviceUrl: ApiConfig.deleteFamilyInfoURL + familyInfoId,
         success: (dio.Response<dynamic> response) {
-          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(response.data);
           if(experienceResponseModel.status ?? false){
             getFamilyDetailInfo();
           }
@@ -416,7 +425,7 @@ class CandidateController extends GetxController {
         params: {},
         serviceUrl: ApiConfig.deleteReferenceURL + refId,
         success: (dio.Response<dynamic> response) {
-          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(response.data);
           if(experienceResponseModel.status ?? false){
             getReferencesList();
           }
@@ -434,7 +443,7 @@ class CandidateController extends GetxController {
         params: {},
         serviceUrl: ApiConfig.deleteLanguageURL + lanId,
         success: (dio.Response<dynamic> response) {
-          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(response.data);
           if(experienceResponseModel.status ?? false){
             getLanguagesList();
           }
@@ -452,7 +461,7 @@ class CandidateController extends GetxController {
         params: {},
         serviceUrl: ApiConfig.deleteQualificationURL + qulID,
         success: (dio.Response<dynamic> response) {
-          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(response.data);
           if(experienceResponseModel.status ?? false){
             getQualificationsList();
           }
@@ -470,7 +479,7 @@ class CandidateController extends GetxController {
         params: {},
         serviceUrl: ApiConfig.deleteExperienceURL + expId,
         success: (dio.Response<dynamic> response) {
-          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(response.data);
           if(experienceResponseModel.status ?? false){
             getExperiencesList();
           }
@@ -483,12 +492,12 @@ class CandidateController extends GetxController {
     );
   }
 
-  void  deleteIdentification({String id = ""}) {
+  void deleteIdentification({String id = ""}) {
     apiServiceCall(
         params: {},
         serviceUrl: ApiConfig.deleteIdentificationURL + id,
         success: (dio.Response<dynamic> response) {
-          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
+          BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(response.data);
           if(experienceResponseModel.status ?? false){
             getIdentificationInfoList();
           }
@@ -538,30 +547,32 @@ class CandidateController extends GetxController {
     );
   }
 
-  void updateAddressView({String infoId = "", Function? callback,String? name,
-    dob,email,emailTwo,pDialCode,pCountryCode,phone,pTwoDialCode,pTwoCountryCode,phoneTwo,
-    gender,totalExpMonth,totalExpYear,status
+  void updateAddressView({Function? callback,String? blockNo,
+    street,landmark,stateId,cityId,countryId,pinCode,cblockNo,cStreet,cLandmark,
+    cState,cCity,cCountry,cPinCode, bool sameAddress = false
   }) {
     apiServiceCall(
         params: {
-          "name": name,
-          "date_of_birth": dob,
-          "email": email,
-          "email_two": emailTwo,
-          "phone_dial_code": pDialCode,
-          "phone_country_code": pCountryCode,
-          "phone": phone,
-          "phone_two_dial_code": pTwoDialCode,
-          "phone_two_country_code": pTwoCountryCode,
-          "phone_two": phoneTwo,
-          "gender": gender,
-          "total_experience_month": totalExpMonth,
-          "total_experience_year": totalExpYear,
-          "status": status,
+          "block_house_no": blockNo,
+          "street_locality": street,
+          "landmark": landmark,
+          "state_id": stateId,
+          "city_id": cityId,
+          "country_id": countryId,
+          "pincode_id": pinCode,
+          "same_correspondence_address": sameAddress == true ? "Yes" : "",
+          "cblock_house_no": cblockNo,
+          "cstreet": cStreet,
+          "clandmark": cLandmark,
+          "cstate": cState,
+          "ccity": cCity,
+          "ccountry": cCountry,
+          "cpincode": cPinCode,
+          "status": "Active",
           "manage_user_id": getLoginData()!.data?.manageUserId.toString(),
           "updated_at": DateTime.now().toString()
         },
-        serviceUrl: ApiConfig.updateAddressURL + infoId,
+        serviceUrl: ApiConfig.updateAddressURL + candidateId.value,
         success: (dio.Response<dynamic> response) {
           BooleanResponseModel experienceResponseModel = BooleanResponseModel.fromJson(jsonDecode(response.data));
           showSnackBar(title: ApiConfig.success, message: experienceResponseModel.message ?? "");
@@ -695,6 +706,7 @@ class CandidateController extends GetxController {
 
   Future<void> addEditCertificationView({String certificateName = "",issuingOrg, issueMonth, expireMonth, credId, credURL, status,
     bool isEdit = false,
+    bool isNotExpire = false,
     String certificationId = "",
     File? attachment,
     Function? callback}) async {
@@ -702,8 +714,9 @@ class CandidateController extends GetxController {
       "candidate_id": candidateId.value,
       "certificate_name": certificateName,
       "issuing_organization": issuingOrg,
+      "does_not_expire": isNotExpire ? "Yes" : "",
       "issue_month": issueMonth,
-      "expire_month": expireMonth,
+      "expire_month": isNotExpire ? "" : expireMonth,
       "credential_id": credId,
       "credential_url": credURL,
       "status": status,
@@ -924,7 +937,7 @@ class CandidateController extends GetxController {
       "degree_name": degreeName,
       "from_month": fromMonth,
       "persuing": persuing ? "Yes" : "",
-      "to_month": toMonth,
+      "to_month": !persuing ? toMonth : "",
       "status": status,
       "manage_user_id": getLoginData()!.data?.manageUserId,
       "updated_at": DateTime.now().toString()

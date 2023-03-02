@@ -26,7 +26,7 @@ class _CompensationViewState extends State<CompensationView> {
       var val = CandidateController.to.candidateDetail.value;
       currentCTCController.text = val.currentCtc ?? "";
       expectedCTCController.text = val.expectedCtc ?? "";
-      isNegotiable = val.negotiable == null ? false : (val.negotiable == "Yes" ? true : false);
+      isNegotiable = val.negotiable == null ? false : (val.negotiable?.toLowerCase() == "yes" ? true : false);
       setState(() {});
     });
     super.initState();

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:html/parser.dart';
 
 import '../common_widgets/common_textfield.dart';
 import '../common_widgets/common_widgets_view.dart';
@@ -24,7 +25,7 @@ class _IndustryViewState extends State<IndustryView> {
     CandidateController.to.getIndustryInfo(callback: (){
       var val = CandidateController.to.candidateDetail.value;
       industryNameController.text = val.industryName ?? "";
-      industryExpertiseController.text = val.expertise ?? "";
+      industryExpertiseController.text = parse(val.expertise).body!.text;
       setState(() {});
     });
     super.initState();
@@ -79,13 +80,16 @@ class _IndustryViewState extends State<IndustryView> {
                 commonHeaderTitle(title: "Industry Information", fontSize: isTablet() ? 1.5 : 1.3, fontWeight: 4),
                 commonFillButtonView(
                     context: context,
-                    title: "ADD",
+                    title: "EDIT",
                     width: 70,
                     height: 35,
                     tapOnButton: () {
-
+                      setState(() {
+                        isEdit = true;
+                      });
                     },
-                    isLoading: false)
+                    isLoading: false
+                )
               ],
             ),
             commonVerticalSpacing(),
@@ -93,7 +97,7 @@ class _IndustryViewState extends State<IndustryView> {
             CommonTextFiled(
                 fieldTitleText: "Industry Name *",
                 hintText: "Industry Name *",
-                // isBorderEnable: false,
+                isEnabled: isEdit,
                 textEditingController: industryNameController,
                 onChangedFunction: (String value){
                 },
@@ -106,8 +110,8 @@ class _IndustryViewState extends State<IndustryView> {
             CommonTextFiled(
                 fieldTitleText: "Industry Expertise",
                 hintText: "Industry Expertise",
-                // isBorderEnable: false,
                 maxLine: 5,
+                isEnabled: isEdit,
                 textEditingController: industryExpertiseController,
                 onChangedFunction: (String value){
                 },

@@ -104,7 +104,9 @@ class _QuestionaryViewState extends State<QuestionaryView> {
                       width: 70,
                       height: 35,
                       tapOnButton: () {
-
+                        setState(() {
+                          isEdit = true;
+                        });
                       },
                       isLoading: false)
                 ],
@@ -112,17 +114,23 @@ class _QuestionaryViewState extends State<QuestionaryView> {
               commonVerticalSpacing(),
               commonCheckBoxTile(title: "Ready to relocate?",callback: (bool val){
                 setState(() {
-                  isReadyToRelocate = val;
+                  if(isEdit) {
+                    isReadyToRelocate = val;
+                  }
                 });
               },isSelected: isReadyToRelocate),
               commonCheckBoxTile(title: "Permanent work from home?",callback: (bool val){
                 setState(() {
-                  isPermanentWFH = val;
+                  if(isEdit) {
+                    isPermanentWFH = val;
+                  }
                 });
               },isSelected: isPermanentWFH),
               commonCheckBoxTile(title: "Candidate Accept Bond?",callback: (bool val){
                 setState(() {
-                  isCandidateAccept = val;
+                  if(isEdit) {
+                    isCandidateAccept = val;
+                  }
                 });
               },isSelected: isCandidateAccept),
               commonVerticalSpacing(),
@@ -131,18 +139,39 @@ class _QuestionaryViewState extends State<QuestionaryView> {
                 children: [
                   Expanded(child: InkWell(
                     onTap: (){
-                      commonBottomView(context: context,
-                          child: CommonBottomStringView(
-                              hintText: "Bond Time",
-                              myItems: const ["0 Years","1 Years", "2 Years", "3 Years", "4 Years", "5 Years", "6 Years", "7 Years", "8 Years", "9 Years", "10 Years"
-                                ,"11 Years", "12 Years", "13 Years", "14 Years", "15 Years", "16 Years", "17 Years", "18 Years", "19 Years", "20 Years"
-                              ],
-                              selectionCallBack: (
-                                  String val) {
-                                setState(() {
-                                  expInYears = val;
-                                });
-                              }));
+                      if(isEdit) {
+                        commonBottomView(context: context,
+                            child: CommonBottomStringView(
+                                hintText: "Bond Time",
+                                myItems: const [
+                                  "0 Years",
+                                  "1 Years",
+                                  "2 Years",
+                                  "3 Years",
+                                  "4 Years",
+                                  "5 Years",
+                                  "6 Years",
+                                  "7 Years",
+                                  "8 Years",
+                                  "9 Years",
+                                  "10 Years",
+                                  "11 Years",
+                                  "12 Years",
+                                  "13 Years",
+                                  "14 Years",
+                                  "15 Years",
+                                  "16 Years",
+                                  "17 Years",
+                                  "18 Years",
+                                  "19 Years",
+                                  "20 Years"
+                                ],
+                                selectionCallBack: (String val) {
+                                  setState(() {
+                                    expInYears = val;
+                                  });
+                                }));
+                      }
                     },
                     child: commonDecoratedTextView(
                         title: expInYears == "" ? "Years" : expInYears,
@@ -152,18 +181,31 @@ class _QuestionaryViewState extends State<QuestionaryView> {
                   commonHorizontalSpacing(),
                   Expanded(child: InkWell(
                     onTap: (){
-                      commonBottomView(context: context,
-                          child: CommonBottomStringView(
-                              hintText: "Select Month",
-                              myItems: const ["0 Months","1 Months", "2 Months", "3 Months", "4 Months", "5 Months"
-                                , "6 Months", "7 Months", "8 Months", "9 Months", "10 Months", "11 Months", "12 Months"
-                              ],
-                              selectionCallBack: (
-                                  String val) {
-                                setState(() {
-                                  expInMonths = val;
-                                });
-                              }));
+                      if(isEdit) {
+                        commonBottomView(context: context,
+                            child: CommonBottomStringView(
+                                hintText: "Select Month",
+                                myItems: const [
+                                  "0 Months",
+                                  "1 Months",
+                                  "2 Months",
+                                  "3 Months",
+                                  "4 Months",
+                                  "5 Months",
+                                  "6 Months",
+                                  "7 Months",
+                                  "8 Months",
+                                  "9 Months",
+                                  "10 Months",
+                                  "11 Months",
+                                  "12 Months"
+                                ],
+                                selectionCallBack: (String val) {
+                                  setState(() {
+                                    expInMonths = val;
+                                  });
+                                }));
+                      }
                     },
                     child: commonDecoratedTextView(
                         title: expInMonths == "" ? "Months" : expInMonths,
@@ -176,16 +218,17 @@ class _QuestionaryViewState extends State<QuestionaryView> {
               commonVerticalSpacing(),
               InkWell(
                 onTap: (){
-                  commonBottomView(context: context,
-                      child: CommonBottomStringView(
-                          hintText: "Days",
-                          myItems: getDaysList(),
-                          selectionCallBack: (
-                              String val) {
-                            setState(() {
-                              selectedNoticePeriod = val;
-                            });
-                          }));
+                  if(isEdit) {
+                    commonBottomView(context: context,
+                        child: CommonBottomStringView(
+                            hintText: "Days",
+                            myItems: getDaysList(),
+                            selectionCallBack: (String val) {
+                              setState(() {
+                                selectedNoticePeriod = val;
+                              });
+                            }));
+                  }
                 },
                 child: commonDecoratedTextView(
                     title: selectedNoticePeriod == "" ? "Days" : selectedNoticePeriod,

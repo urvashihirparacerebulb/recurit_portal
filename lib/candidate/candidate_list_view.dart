@@ -1,9 +1,12 @@
 import 'package:cerebulb_recruit_portal/controllers/candidate_controller.dart';
 import 'package:cerebulb_recruit_portal/home_screen.dart';
+import 'package:cerebulb_recruit_portal/utility/color_utility.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../common_widgets/common_widgets_view.dart';
+import '../configurations/config_file.dart';
+import '../utility/common_methods.dart';
 import '../utility/screen_utility.dart';
 
 class CandidateListView extends StatefulWidget {
@@ -25,7 +28,19 @@ class _CandidateListViewState extends State<CandidateListView> {
   Widget build(BuildContext context) {
     return commonStructure(
       context: context,
-      appBar: commonAppbar(context: context,title: "Needle Record List"),
+      appBar: commonAppbar(context: context,title: "Candidates List",
+        centerTitle: true,
+        actionsWidgets: [Padding(
+          padding: const EdgeInsets.only(right: 10.0),
+          child: InkWell(
+            onTap: (){
+              setIsLogin(isLogin: false);
+              setObject(ApiConfig.loginPref, null);
+            },
+            child: const Icon(Icons.logout,color: blackColor,),
+          ),
+        )]
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Obx(() => CandidateController.to.candidateList.isEmpty ? Center(

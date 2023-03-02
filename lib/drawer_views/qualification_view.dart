@@ -1,13 +1,17 @@
 import 'dart:io';
 
 import 'package:cerebulb_recruit_portal/models/candidate_model.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../common_widgets/common_textfield.dart';
 import '../common_widgets/common_widgets_view.dart';
+import '../configurations/api_service.dart';
+import '../configurations/api_utility.dart';
 import '../controllers/candidate_controller.dart';
 import '../theme/convert_theme_colors.dart';
 import '../utility/color_utility.dart';
@@ -129,18 +133,16 @@ class _QualificationViewState extends State<QualificationView> {
               children: [
                 InkWell(
                     onTap: () async {
-                      final ImagePicker picker = ImagePicker();
-                      try {
-                        final XFile? pickedFile = await picker.pickImage(
-                          source: ImageSource.gallery,
-                        );
-                        setState(() {
-                          onChanged!(File(pickedFile!.path));
-                        });
-                      } catch (e) {
-                        if (kDebugMode) {
-                          print(e);
-                        }
+                      FilePickerResult? result =
+                      await FilePicker.platform.pickFiles(allowMultiple: true,
+                          type: FileType.custom,
+                          allowedExtensions: ["pdf", "docx","jpg","jpeg","png","exe"]
+                      );
+
+                      if (result != null) {
+                        List<File?> files = result.paths.map((path) => File(path!)).toList();
+                        onChanged!(files);
+                      } else {
                       }
                     },
                     child: commonHeaderTitle(
@@ -259,11 +261,99 @@ class _QualificationViewState extends State<QualificationView> {
                   )
               )
           ),
-          PopupMenuItem<String>(
+          if(qualification.marksheet!.isNotEmpty || qualification.certificate != null)
+            PopupMenuItem<String>(
               value: 'Download',
               child: InkWell(
-                  onTap: (){
+                  onTap: () async {
                     Get.back();
+                    showDialog(context: context, builder: (BuildContext context) => Dialog(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+                      elevation: 0.0,
+                      backgroundColor: Colors.transparent,
+                      child: Container(
+                        margin: const EdgeInsets.only(left: 0.0, right: 0.0),
+                        child: Container(
+                          padding: const EdgeInsets.only(top: 18.0),
+                          margin: const EdgeInsets.only(top: 13.0, right: 8.0),
+                          decoration: BoxDecoration(
+                              color: whiteColor,
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.circular(16.0),
+                              boxShadow: const <BoxShadow>[
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 0.0,
+                                  offset: Offset(0.0, 0.0),
+                                ),
+                              ]),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: ListView(
+                              shrinkWrap: true,
+                              children: <Widget>[
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    InkWell(
+                                      onTap: (){
+                                        Get.back();
+                                      },
+                                      child: const Icon(Icons.clear,color: blackColor),
+                                    )
+                                  ],
+                                ),
+                                commonVerticalSpacing(),
+                                ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: qualification.marksheet?.length,
+                                  itemBuilder: (context, index) {
+                                    return Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        commonHeaderTitle(
+                                          title: "Marksheet",
+                                          fontWeight: 1,
+                                        ),
+                                        InkWell(
+                                          onTap: () async {
+                                            var tempDir = await getTemporaryDirectory();
+                                            String fullPath = tempDir.path;
+                                            if(qualification.marksheet!.isNotEmpty){
+                                              download2(APIProvider.getDio(), qualification.marksheet![index].link ?? "", fullPath);
+                                            }
+                                          },
+                                            child: const Icon(Icons.download))
+                                      ],
+                                    );
+                                },),
+                                commonVerticalSpacing(),
+                                qualification.certificate != null && qualification.certificate!.isNotEmpty ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    commonHeaderTitle(
+                                      title: "Certificate",
+                                      fontWeight: 1,
+                                    ),
+                                    InkWell(
+                                        onTap: () async {
+                                          var tempDir = await getTemporaryDirectory();
+                                          String fullPath = tempDir.path;
+                                          if(qualification.certificate != null && qualification.certificate!.isNotEmpty){
+                                            download2(APIProvider.getDio(), qualification.certificate ?? "", fullPath);
+                                          }
+                                        },
+                                        child: const Icon(Icons.download))
+                                  ],
+                                ) : Container(),
+                                commonVerticalSpacing(),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ));
                   },
                   child: Row(
                     children: [
@@ -359,7 +449,7 @@ class _QualificationViewState extends State<QualificationView> {
                             Row(
                               children: [
                                 commonHeaderTitle(title: e.fromMonth ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
-                                commonHeaderTitle(title: e.toMonth ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1)
+                                commonHeaderTitle(title: e.persuing == "Yes" ? " | Persuing" : e.toMonth ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1)
                               ],
                             ),
                             Expanded(flex: 2,child: Align(
@@ -474,13 +564,15 @@ class _QualificationViewState extends State<QualificationView> {
                     });
                   },isSelected: isCurrentlyPersuing),
                   commonVerticalSpacing(spacing: 15),
-                  multipleImageView(title: "Marksheet", onChanged: (File file){
+                  multipleImageView(title: "MarkSheets", onChanged: (List<File> filePaths){
                     setState(() {
-                      ImageModel marksheet = ImageModel();
-                      marksheet.filename = "";
-                      marksheet.link = "";
-                      marksheet.filePath = file;
-                      markSheetImages?.add(marksheet);
+                      for (var element in filePaths) {
+                        ImageModel markSheet = ImageModel();
+                        markSheet.filename = "";
+                        markSheet.link = "";
+                        markSheet.filePath = element;
+                        markSheetImages?.add(markSheet);
+                      }
                     });
                   }),
                   commonVerticalSpacing(spacing: 20),

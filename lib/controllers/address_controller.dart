@@ -16,7 +16,7 @@ class AddressController extends GetxController {
   RxList<CountryState> statesList = RxList<CountryState>();
   RxList<CountryState> citiesList = RxList<CountryState>();
   RxList<CountryState> pinCodesList = RxList<CountryState>();
-
+  RxList<AddressResponse> addressLists = RxList<AddressResponse>();
 
   void getCountriesList({Function? callback}) {
     apiServiceCall(
@@ -90,7 +90,7 @@ class AddressController extends GetxController {
     );
   }
 
-  void addNewPinCode({String pinCode = "", cityId}) {
+  void addNewPinCode({String pinCode = "", cityId, Function? callback}) {
     apiServiceCall(
         params: {
           "pincode_no": pinCode,
@@ -103,7 +103,26 @@ class AddressController extends GetxController {
         serviceUrl: ApiConfig.addNewPinCode,
         success: (dio.Response<dynamic> response) {
           Get.back();
+          callback!();
+        },
+        error: (dio.Response<dynamic> response) {
+          errorHandling(response);
+        },
+        isProgressShow: true,
+        methodType: ApiConfig.methodPOST
+    );
+  }
 
+  void getAddressFromPinCode({Function? callback, String pinCode = ""}) {
+    apiServiceCall(
+        params: {
+          "pincode_no": pinCode
+        },
+        serviceUrl: ApiConfig.fetchAddressFromPinURL,
+        success: (dio.Response<dynamic> response) {
+          AddressResponseModel addressResponseModel = AddressResponseModel.fromJson(jsonDecode(response.data));
+          addressLists.addAll(addressResponseModel.data ?? []);
+          callback!();
         },
         error: (dio.Response<dynamic> response) {
           errorHandling(response);

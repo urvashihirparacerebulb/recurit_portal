@@ -125,8 +125,10 @@ class _FamilyDetailsViewState extends State<FamilyDetailsView> {
                             status: "Active",
                             callback: (){
                               CandidateController.to.getFamilyDetailInfo();
-                              isAdd = false;
-                              isEdit = false;
+                              setState(() {
+                                isAdd = false;
+                                isEdit = false;
+                              });
                             }
                         );
                       },

@@ -28,7 +28,7 @@ class _BasicInformationViewState extends State<BasicInformationView> {
   String selectedGender = "";
   String expInYears = "";
   String expInMonths = "";
-  String dateOfBirth = DateTime(DateTime.now().year - 18, 01, 01).toString();
+  String dateOfBirth = DateFormat("yyyy-MM-dd").format(DateTime.now());
   bool isEdit = false;
 
   @override
@@ -45,10 +45,7 @@ class _BasicInformationViewState extends State<BasicInformationView> {
       secondaryEmailController.text = val.emailTwo ?? "";
       selectedGender = val.gender ?? "";
       if(val.dateOfBirth != null) {
-        dateOfBirth = DateTime(int.parse(val.dateOfBirth!.split("-")[0]),
-            int.parse(val.dateOfBirth!.split("-")[1]),
-            int.parse(val.dateOfBirth!.split("-")[2]))
-            .toString();
+        dateOfBirth = val.dateOfBirth ?? "";
       }
       mobileController.text = val.phone ?? "";
       otherMobileController.text = val.phoneTwo ?? "";
@@ -84,7 +81,8 @@ class _BasicInformationViewState extends State<BasicInformationView> {
                     tapOnButton: () {
                       CandidateController.to.updateBasicInformation(
                           infoId: CandidateController.to.candidateDetail.value.candidateId.toString(),
-                          name: nameController.text,dob: dateOfBirth,email: emailController.text,
+                          name: nameController.text,
+                          dob: dateOfBirth,email: emailController.text,
                           emailTwo: secondaryEmailController.text,gender: selectedGender,pDialCode: CandidateController.to.candidateDetail.value.phoneDialCode,
                           pCountryCode: CandidateController.to.candidateDetail.value.phoneCountryCode,
                           pTwoCountryCode: CandidateController.to.candidateDetail.value.phoneTwoCountryCode,
@@ -170,7 +168,9 @@ class _BasicInformationViewState extends State<BasicInformationView> {
                     ? notEmptyFieldMessage
                     : null;
               }),
-            commonVerticalSpacing(),
+            commonVerticalSpacing(spacing: 20),
+            commonHeaderTitle(title: "Gender *", isChangeColor: true, color: Colors.grey,fontSize: 1.0,fontWeight: 2),
+            commonVerticalSpacing(spacing: 8),
             InkWell(
               onTap: (){
                 commonBottomView(context: context,
@@ -189,7 +189,8 @@ class _BasicInformationViewState extends State<BasicInformationView> {
                   isChangeColor: selectedGender == "" ? true : false
               ),
             ),
-            commonVerticalSpacing(),
+            commonHeaderTitle(title: "Date Of Birth", isChangeColor: true, color: Colors.grey,fontSize: 1.0,fontWeight: 2),
+            commonVerticalSpacing(spacing: 8),
             Container(
                 height: 50,
                 padding: EdgeInsets.symmetric(horizontal: commonHorizontalPadding),
@@ -211,7 +212,7 @@ class _BasicInformationViewState extends State<BasicInformationView> {
                               initialDate: DateTime(DateTime.now().year - 18, 01, 01).toString(),
                             ).then((value) {
                               setState(() {
-                                dateOfBirth = DateFormat("dd-MM-yyyy").format(value);
+                                dateOfBirth = DateFormat("yyyy-MM-dd").format(value);
                               });
                             });
                           },
@@ -263,46 +264,63 @@ class _BasicInformationViewState extends State<BasicInformationView> {
             commonVerticalSpacing(),
             Row(
               children: [
-                Expanded(child: InkWell(
-                  onTap: (){
-                    commonBottomView(context: context,
-                        child: CommonBottomStringView(
-                            hintText: "Total Experience *",
-                            myItems: const ["0 Years","1 Years", "2 Years", "3 Years", "4 Years", "5 Years", "6 Years", "7 Years", "8 Years", "9 Years", "10 Years",
-                              "11 Years", "12 Years", "13 Years", "14 Years", "15 Years", "16 Years", "17 Years", "18 Years", "19 Years", "20 Years"
-                            ],
-                            selectionCallBack: (
-                                String val) {
-                              setState(() {
-                                expInYears = val;
-                              });
-                            }));
-                  },
-                  child: commonDecoratedTextView(
-                      title: expInYears == "" ? "Years" : expInYears,
-                      isChangeColor: expInYears == "" ? true : false
-                  ),
+                Expanded(child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    commonVerticalSpacing(),
+                    commonHeaderTitle(title: "Total Experience *", isChangeColor: true, color: Colors.grey,fontSize: 1.0,fontWeight: 2),
+                    commonVerticalSpacing(spacing: 8),
+                    InkWell(
+                      onTap: (){
+                        commonBottomView(context: context,
+                            child: CommonBottomStringView(
+                                hintText: "Total Experience *",
+                                myItems: const ["0 Years","1 Years", "2 Years", "3 Years", "4 Years", "5 Years", "6 Years", "7 Years", "8 Years", "9 Years", "10 Years",
+                                  "11 Years", "12 Years", "13 Years", "14 Years", "15 Years", "16 Years", "17 Years", "18 Years", "19 Years", "20 Years"
+                                ],
+                                selectionCallBack: (
+                                    String val) {
+                                  setState(() {
+                                    expInYears = val;
+                                  });
+                                }));
+                      },
+                      child: commonDecoratedTextView(
+                          title: expInYears == "" ? "Years" : expInYears,
+                          isChangeColor: expInYears == "" ? true : false
+                      ),
+                    ),
+                  ],
                 )),
                 commonHorizontalSpacing(),
-                Expanded(child: InkWell(
-                  onTap: (){
-                    commonBottomView(context: context,
-                        child: CommonBottomStringView(
-                            hintText: "Select Month",
-                            myItems: const ["0 Months","1 Months", "2 Months", "3 Months", "4 Months", "5 Months",
-                              "6 Months", "7 Months", "8 Months", "9 Months", "10 Months", "11 Months", "12 Months"
-                            ],
-                            selectionCallBack: (String val) {
-                              setState(() {
-                                expInMonths = val;
-                              });
-                            })
-                    );
-                  },
-                  child: commonDecoratedTextView(
-                      title: expInMonths == "" ? "Months" : expInMonths,
-                      isChangeColor: expInMonths == "" ? true : false,
-                  ),
+                Expanded(child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    commonVerticalSpacing(),
+                    commonHeaderTitle(title: "Select Month", isChangeColor: true, color: Colors.grey,fontSize: 1.0,fontWeight: 2),
+                    commonVerticalSpacing(spacing: 8),
+                    InkWell(
+                      onTap: (){
+                        commonBottomView(context: context,
+                            child: CommonBottomStringView(
+                                hintText: "Select Month",
+                                myItems: const ["0 Months","1 Months", "2 Months", "3 Months", "4 Months", "5 Months",
+                                  "6 Months", "7 Months", "8 Months", "9 Months", "10 Months", "11 Months", "12 Months"
+                                ],
+                                selectionCallBack: (String val) {
+                                  setState(() {
+                                    expInMonths = val;
+                                  });
+                                })
+                        );
+                      },
+                      child: commonDecoratedTextView(
+                          title: expInMonths == "" ? "Months" : expInMonths,
+                          isChangeColor: expInMonths == "" ? true : false,
+                      ),
+                    ),
+                  ],
                 )),
               ],
             )

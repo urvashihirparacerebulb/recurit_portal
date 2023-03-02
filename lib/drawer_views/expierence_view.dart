@@ -1,13 +1,18 @@
 import 'dart:io';
 
 import 'package:cerebulb_recruit_portal/models/candidate_model.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:html/parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../common_widgets/common_textfield.dart';
 import '../common_widgets/common_widgets_view.dart';
+import '../configurations/api_service.dart';
+import '../configurations/api_utility.dart';
 import '../controllers/candidate_controller.dart';
 import '../theme/convert_theme_colors.dart';
 import '../utility/color_utility.dart';
@@ -139,18 +144,16 @@ class _ExpierenceViewState extends State<ExpierenceView> {
               children: [
                 InkWell(
                     onTap: () async {
-                      final ImagePicker picker = ImagePicker();
-                      try {
-                        final XFile? pickedFile = await picker.pickImage(
-                          source: ImageSource.gallery,
-                        );
-                        setState(() {
-                          onChanged!(File(pickedFile!.path));
-                        });
-                      } catch (e) {
-                        if (kDebugMode) {
-                          print(e);
-                        }
+                      FilePickerResult? result =
+                      await FilePicker.platform.pickFiles(allowMultiple: true,
+                        type: FileType.custom,
+                        allowedExtensions: ["pdf", "docx","jpg","jpeg","png","exe"]
+                      );
+
+                      if (result != null) {
+                        List<File?> files = result.paths.map((path) => File(path!)).toList();
+                        onChanged!(files);
+                      } else {
                       }
                     },
                     child: commonHeaderTitle(
@@ -243,6 +246,8 @@ class _ExpierenceViewState extends State<ExpierenceView> {
               value: 'Edit',
               child: InkWell(
                   onTap: (){
+                    salarySlipsImages?.clear();
+                    otherAttachmentsImages?.clear();
                     setState((){
                       isAdd = true;
                       isEdit = true;
@@ -299,6 +304,157 @@ class _ExpierenceViewState extends State<ExpierenceView> {
               child: InkWell(
                   onTap: (){
                     Get.back();
+                    showDialog(context: context, builder: (BuildContext context) => Dialog(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+                      elevation: 0.0,
+                      backgroundColor: Colors.transparent,
+                      child: Container(
+                        margin: const EdgeInsets.only(left: 0.0, right: 0.0),
+                        child: Container(
+                          padding: const EdgeInsets.only(top: 18.0),
+                          margin: const EdgeInsets.only(top: 13.0, right: 8.0),
+                          decoration: BoxDecoration(
+                              color: whiteColor,
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.circular(16.0),
+                              boxShadow: const <BoxShadow>[
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 0.0,
+                                  offset: Offset(0.0, 0.0),
+                                ),
+                              ]),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: ListView(
+                              shrinkWrap: true,
+                              children: <Widget>[
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    InkWell(
+                                      onTap: (){
+                                        Get.back();
+                                      },
+                                      child: const Icon(Icons.clear,color: blackColor),
+                                    )
+                                  ],
+                                ),
+                                commonVerticalSpacing(),
+                                ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: experience.salarySlip?.length,
+                                  itemBuilder: (context, index) {
+                                    return Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        commonHeaderTitle(
+                                          title: "Salary Slips",
+                                          fontWeight: 1,
+                                        ),
+                                        InkWell(
+                                            onTap: () async {
+                                              var tempDir = await getTemporaryDirectory();
+                                              String fullPath = tempDir.path;
+                                              if(experience.salarySlip!.isNotEmpty){
+                                                download2(APIProvider.getDio(), experience.salarySlip![index].link ?? "", fullPath);
+                                              }
+                                            },
+                                            child: const Icon(Icons.download))
+                                      ],
+                                    );
+                                  },),
+                                commonVerticalSpacing(),
+                                ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: experience.otherAttachement?.length,
+                                  itemBuilder: (context, index) {
+                                    return Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        commonHeaderTitle(
+                                          title: "Other Attachments",
+                                          fontWeight: 1,
+                                        ),
+                                        InkWell(
+                                            onTap: () async {
+                                              var tempDir = await getTemporaryDirectory();
+                                              String fullPath = tempDir.path;
+                                              if(experience.otherAttachement!.isNotEmpty){
+                                                download2(APIProvider.getDio(), experience.otherAttachement![index].link ?? "", fullPath);
+                                              }
+                                            },
+                                            child: const Icon(Icons.download))
+                                      ],
+                                    );
+                                  },),
+                                commonVerticalSpacing(),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    commonHeaderTitle(
+                                      title: "Offer Letter",
+                                      fontWeight: 1,
+                                    ),
+                                    InkWell(
+                                        onTap: () async {
+                                          var tempDir = await getTemporaryDirectory();
+                                          String fullPath = tempDir.path;
+                                          if(experience.offerLetter != null && experience.offerLetter!.isNotEmpty){
+                                            download2(APIProvider.getDio(), experience.offerLetter ?? "", fullPath);
+                                          }
+                                        },
+                                        child: const Icon(Icons.download))
+                                  ],
+                                ),
+                                commonVerticalSpacing(),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    commonHeaderTitle(
+                                      title: "Relieving Letter",
+                                      fontWeight: 1,
+                                    ),
+                                    InkWell(
+                                        onTap: () async {
+                                          var tempDir = await getTemporaryDirectory();
+                                          String fullPath = tempDir.path;
+                                          if(experience.relievingLetter != null && experience.relievingLetter!.isNotEmpty){
+                                            download2(APIProvider.getDio(), experience.relievingLetter ?? "", fullPath);
+                                          }
+                                        },
+                                        child: const Icon(Icons.download)
+                                    )
+                                  ],
+                                ),
+                                commonVerticalSpacing(),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    commonHeaderTitle(
+                                      title: "Experience Letter",
+                                      fontWeight: 1,
+                                    ),
+                                    InkWell(
+                                        onTap: () async {
+                                          var tempDir = await getTemporaryDirectory();
+                                          String fullPath = tempDir.path;
+                                          if(experience.experienceLetter != null && experience.experienceLetter!.isNotEmpty){
+                                            download2(APIProvider.getDio(), experience.experienceLetter ?? "", fullPath);
+                                          }
+                                        },
+                                        child: const Icon(Icons.download))
+                                  ],
+                                ),
+                                commonVerticalSpacing(),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ));
                   },
                   child: Row(
                     children: [
@@ -400,7 +556,7 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            commonHeaderTitle(title: e.responsibility ?? "", fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
+                            commonHeaderTitle(title: parse(e.responsibility).body!.text, fontSize: isTablet() ? 1.3 : 1, fontWeight: 1),
                             Expanded(flex: 2,child: Align(
                                 alignment: Alignment.bottomRight,
                                 child: GestureDetector(
@@ -527,23 +683,27 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                     });
                   },selectedFile: experienceLetterImage),
                   commonVerticalSpacing(spacing: 15),
-                  multipleImageView(title: "Salary Slips", onChanged: (File file){
+                  multipleImageView(title: "Salary Slips", onChanged: (List<File> filePaths){
                     setState(() {
-                      ImageModel marksheet = ImageModel();
-                      marksheet.filename = "";
-                      marksheet.link = "";
-                      marksheet.filePath = file;
-                      salarySlipsImages?.add(marksheet);
+                      for (var element in filePaths) {
+                        ImageModel salarySlip = ImageModel();
+                        salarySlip.filename = "";
+                        salarySlip.link = "";
+                        salarySlip.filePath = element;
+                        salarySlipsImages?.add(salarySlip);
+                      }
                     });
                   }),
                   commonVerticalSpacing(spacing: 20),
-                  multipleImageView(title: "Other attachments", onChanged: (File file){
+                  multipleImageView(title: "Other attachments", onChanged: (List<File> filePaths){
                     setState(() {
-                      ImageModel marksheet = ImageModel();
-                      marksheet.filename = "";
-                      marksheet.link = "";
-                      marksheet.filePath = file;
-                      otherAttachmentsImages?.add(marksheet);
+                      for (var element in filePaths) {
+                        ImageModel otherAttachment = ImageModel();
+                        otherAttachment.filename = "";
+                        otherAttachment.link = "";
+                        otherAttachment.filePath = element;
+                        otherAttachmentsImages?.add(otherAttachment);
+                      }
                     });
                   }),
                   commonVerticalSpacing(spacing: 20),
