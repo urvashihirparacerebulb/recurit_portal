@@ -21,23 +21,16 @@ class AddPinCodeView extends StatefulWidget {
 }
 
 class _AddPinCodeViewState extends State<AddPinCodeView> {
-  TextEditingController cityController = TextEditingController();
-  TextEditingController stateController = TextEditingController();
-  TextEditingController countryController = TextEditingController();
+  // TextEditingController stateController = TextEditingController();
+  // TextEditingController countryController = TextEditingController();
   TextEditingController pinCodeController = TextEditingController();
+  CountryState? selectedCountry;
+  CountryState? selectedState;
   CountryState? selectedCity;
 
   @override
   void initState() {
-    setInitialData();
     super.initState();
-  }
-
-  setInitialData(){
-    setState(() {
-      countryController.text = widget.country;
-      stateController.text = widget.state;
-    });
   }
 
   @override
@@ -75,33 +68,58 @@ class _AddPinCodeViewState extends State<AddPinCodeView> {
             // crossAxisAlignment: CrossAxisAlignment.center,
             // mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              CommonTextFiled(
-                  fieldTitleText: "Country",
-                  hintText: "Country",
-                  isEnabled: false,
-                  textEditingController: countryController,
-                  onChangedFunction: (String value){
-                  },
-                  validationFunction: (String value) {
-                    return value.toString().isEmpty
-                        ? notEmptyFieldMessage
-                        : null;
-                  }),
-              commonVerticalSpacing(),
-              CommonTextFiled(
-                  fieldTitleText: "State/Province",
-                  hintText: "State/Province",
-                  isEnabled: false,
-                  textEditingController: stateController,
-                  onChangedFunction: (String value){
-                  },
-                  validationFunction: (String value) {
-                    return value.toString().isEmpty
-                        ? notEmptyFieldMessage
-                        : null;
-                  }),
-
-              commonVerticalSpacing(),
+              commonVerticalSpacing(spacing: 20),
+              commonHeaderTitle(title: "Country *", isChangeColor: true, color: Colors.grey,fontSize: 1.0,fontWeight: 2),
+              commonVerticalSpacing(spacing: 8),
+              InkWell(
+                onTap: (){
+                  commonBottomView(context: context,
+                      child: AddressBottomView(
+                          title: "Country *",
+                          myItems: AddressController.to.countriesList.value,
+                          selectionCallBack: (CountryState val) {
+                            AddressController.to.getStatesList(callback: (){},countryId: val.id.toString());
+                            selectedState = null;
+                            selectedCity = null;
+                            setState(() {
+                              selectedCountry = val;
+                            });
+                          })
+                  );
+                },
+                child: commonDecoratedTextView(
+                    bottom: 10,
+                    title: selectedCountry == null ? "Select Country" : selectedCountry!.name ?? "",
+                    isChangeColor: selectedCountry == null ? true : false
+                ),
+              ),
+              commonVerticalSpacing(spacing: 20),
+              commonHeaderTitle(title: "State/Province *", isChangeColor: true, color: Colors.grey,fontSize: 1.0,fontWeight: 2),
+              commonVerticalSpacing(spacing: 8),
+              InkWell(
+                onTap: (){
+                  commonBottomView(context: context,
+                      child: AddressBottomView(
+                          title: "State/Province *",
+                          myItems: AddressController.to.statesList.value,
+                          selectionCallBack: (CountryState val) {
+                            AddressController.to.getCitiesList(callback: (){},stateId: val.id.toString());
+                            selectedCity = null;
+                            setState(() {
+                              selectedState = val;
+                            });
+                          })
+                  );
+                },
+                child: commonDecoratedTextView(
+                    bottom: 10,
+                    title: selectedState == null ? "Select State/Province" : selectedState!.name ?? "",
+                    isChangeColor: selectedState == null ? true : false
+                ),
+              ),
+              commonVerticalSpacing(spacing: 20),
+              commonHeaderTitle(title: "City *", isChangeColor: true, color: Colors.grey,fontSize: 1.0,fontWeight: 2),
+              commonVerticalSpacing(spacing: 8),
               InkWell(
                 onTap: (){
                     commonBottomView(context: context,

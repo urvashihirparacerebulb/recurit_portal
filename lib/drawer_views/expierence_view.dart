@@ -44,8 +44,8 @@ class _ExpierenceViewState extends State<ExpierenceView> {
   bool isAdd = false;
   bool isEdit = false;
   Experience? selectedExperience;
-  List<ImageModel>? salarySlipsImages = [];
-  List<ImageModel>? otherAttachmentsImages = [];
+  List<ImageModel> salarySlipsImages = [];
+  List<ImageModel> otherAttachmentsImages = [];
 
   @override
   void initState() {
@@ -124,7 +124,7 @@ class _ExpierenceViewState extends State<ExpierenceView> {
 
   multipleImageView({String title = "", Function? onChanged}) {
     return SizedBox(
-      height: title == "Salary Slips" ? salarySlipsImages!.isNotEmpty ? 180 : 80 : otherAttachmentsImages!.isNotEmpty ? 180 : 80,
+      height: title == "Salary Slips" ? salarySlipsImages.isNotEmpty ? 180 : 80 : otherAttachmentsImages.isNotEmpty ? 180 : 80,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -176,40 +176,43 @@ class _ExpierenceViewState extends State<ExpierenceView> {
           commonVerticalSpacing(spacing: 8),
           Expanded(child: ListView.builder(
             shrinkWrap: true,
-            itemCount: title == "Salary Slips" ? salarySlipsImages?.length : otherAttachmentsImages?.length,
+            itemCount: title == "Salary Slips" ? salarySlipsImages.length : otherAttachmentsImages.length,
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) {
-              if((title == "Salary Slips" ? salarySlipsImages![index].filePath : otherAttachmentsImages![index].filePath) == null){
+              if((title == "Salary Slips" ? salarySlipsImages[index].filePath : otherAttachmentsImages[index].filePath) == null){
                 return Row(
                   children: [
                     InkWell(
                       onTap: (){
-                        launchInBrowser(title == "Salary Slips" ? salarySlipsImages![index].link ?? "" : otherAttachmentsImages![index].link ?? "");
+                        launchInBrowser(title == "Salary Slips" ? salarySlipsImages[index].link ?? "" : otherAttachmentsImages[index].link ?? "");
                       },
-                      child: GetUtils.isPDF(title == "Salary Slips" ? salarySlipsImages![index].link ?? "" :
-                        otherAttachmentsImages![index].link ?? "") ?
+                      child: GetUtils.isPDF(title == "Salary Slips" ? salarySlipsImages[index].link ?? "" :
+                        otherAttachmentsImages[index].link ?? "") ?
                         const Icon(Icons.picture_as_pdf_outlined,color: dangerColor,size: 100,) :
-                        Image.network(title == "Salary Slips" ? salarySlipsImages![index].link ?? "" :
-                        otherAttachmentsImages![index].link ?? "", height: 100),
+                        Image.network(title == "Salary Slips" ? salarySlipsImages[index].link ?? "" :
+                        otherAttachmentsImages[index].link ?? "", height: 100),
                     ),
                     commonHorizontalSpacing(spacing: 20),
                     InkWell(
                       onTap: (){
                         if(title == "Salary Slips") {
-                          CandidateController.to.deleteOtherAttachmentsForExperience(
+                          CandidateController.to.deleteSalarySlipsExperience(
                               expId: selectedExperience?.id,
-                              docName: salarySlipsImages![index]
+                              docName: salarySlipsImages[index]
                                   .filename ?? "",
                               callback: () {
+                                salarySlipsImages.removeAt(index);
                                 CandidateController.to.getExperiencesList();
                               }
                           );
                         }else{
-                          CandidateController.to.deleteSalarySlipsExperience(
+                          CandidateController.to.deleteOtherAttachmentsForExperience(
                               expId: selectedExperience?.id,
-                              docName: otherAttachmentsImages![index]
+                              docName: otherAttachmentsImages[index]
                                   .filename ?? "",
                               callback: () {
+                                Get.back();
+                                otherAttachmentsImages.removeAt(index);
                                 CandidateController.to.getExperiencesList();
                               }
                           );
@@ -221,7 +224,7 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                   ],
                 );
               }
-              return Image.file(title == "Salary Slips" ? salarySlipsImages![index].filePath! : otherAttachmentsImages![index].filePath!, height: 100);
+              return Image.file(title == "Salary Slips" ? salarySlipsImages[index].filePath! : otherAttachmentsImages[index].filePath!, height: 100);
             },
           ))
         ],
@@ -246,8 +249,8 @@ class _ExpierenceViewState extends State<ExpierenceView> {
               value: 'Edit',
               child: InkWell(
                   onTap: (){
-                    salarySlipsImages?.clear();
-                    otherAttachmentsImages?.clear();
+                    salarySlipsImages.clear();
+                    otherAttachmentsImages.clear();
                     setState((){
                       isAdd = true;
                       isEdit = true;
@@ -261,14 +264,14 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                       if(experience.salarySlip!.isNotEmpty){
                         experience.salarySlip?.forEach((element) {
                           if((element.link != null || element.filename != "")){
-                            salarySlipsImages!.add(element);
+                            salarySlipsImages.add(element);
                           }
                         });
                       }
                       if(experience.otherAttachement!.isNotEmpty){
                         experience.otherAttachement?.forEach((element) {
                           if((element.link != null || element.filename != "")){
-                            otherAttachmentsImages!.add(element);
+                            otherAttachmentsImages.add(element);
                           }
                         });
                       }
@@ -355,7 +358,7 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                                         ),
                                         InkWell(
                                             onTap: () async {
-                                              var tempDir = await getTemporaryDirectory();
+                                              var tempDir = await getApplicationDocumentsDirectory();
                                               String fullPath = tempDir.path;
                                               if(experience.salarySlip!.isNotEmpty){
                                                 download2(APIProvider.getDio(), experience.salarySlip![index].link ?? "", fullPath);
@@ -380,7 +383,7 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                                         ),
                                         InkWell(
                                             onTap: () async {
-                                              var tempDir = await getTemporaryDirectory();
+                                              var tempDir = await getApplicationDocumentsDirectory();
                                               String fullPath = tempDir.path;
                                               if(experience.otherAttachement!.isNotEmpty){
                                                 download2(APIProvider.getDio(), experience.otherAttachement![index].link ?? "", fullPath);
@@ -400,7 +403,7 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                                     ),
                                     InkWell(
                                         onTap: () async {
-                                          var tempDir = await getTemporaryDirectory();
+                                          var tempDir = await getApplicationDocumentsDirectory();
                                           String fullPath = tempDir.path;
                                           if(experience.offerLetter != null && experience.offerLetter!.isNotEmpty){
                                             download2(APIProvider.getDio(), experience.offerLetter ?? "", fullPath);
@@ -419,7 +422,7 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                                     ),
                                     InkWell(
                                         onTap: () async {
-                                          var tempDir = await getTemporaryDirectory();
+                                          var tempDir = await getApplicationDocumentsDirectory();
                                           String fullPath = tempDir.path;
                                           if(experience.relievingLetter != null && experience.relievingLetter!.isNotEmpty){
                                             download2(APIProvider.getDio(), experience.relievingLetter ?? "", fullPath);
@@ -439,7 +442,7 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                                     ),
                                     InkWell(
                                         onTap: () async {
-                                          var tempDir = await getTemporaryDirectory();
+                                          var tempDir = await getApplicationDocumentsDirectory();
                                           String fullPath = tempDir.path;
                                           if(experience.experienceLetter != null && experience.experienceLetter!.isNotEmpty){
                                             download2(APIProvider.getDio(), experience.experienceLetter ?? "", fullPath);
@@ -502,12 +505,14 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                             offerLetter: offerLetterImage,
                             experienceLetter: experienceLetterImage,
                             relievingLetter: relievingLetterImage,
-                            salarySlips: salarySlipsImages!.where((element) => element.filename != null).map((e) => e.filePath!).toList(),
-                            otherAttachments: otherAttachmentsImages!.where((element) => element.filename != null).map((e) => e.filePath!).toList(),
+                            salarySlips: salarySlipsImages.isEmpty ? [] : salarySlipsImages.where((element) => element.filename != null).map((e) => (e.filePath ?? File(""))).toList(),
+                            otherAttachments: otherAttachmentsImages.isEmpty ? [] : otherAttachmentsImages.where((element) => element.filename != null).map((e) => (e.filePath ?? File(""))).toList(),
                             callback: (){
                               CandidateController.to.getExperiencesList();
-                              isAdd = false;
-                              isEdit = false;
+                              setState(() {
+                                isAdd = false;
+                                isEdit = false;
+                              });
                             }
                         );
                       },
@@ -519,6 +524,12 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                       tapOnButton: () {
                         setState(() {
                           isAdd = true;
+                          profileNameController.text = "";
+                          companyNameController.text = "";
+                          responsibilityController.text = "";durationTo = "";durationFrom = "";
+                          isCurrentlyWorkingHere = false;
+                          offerLetterImage = null; relievingLetterImage = null;
+                          experienceLetterImage = null; salarySlipsImages.clear(); otherAttachmentsImages.clear();
                         });
                       },
                       isLoading: false)
@@ -642,11 +653,15 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                       commonHorizontalSpacing(spacing: 10),
                       Expanded(child: InkWell(
                         onTap: (){
-                          showDialog(context: context, barrierDismissible: false,builder: (BuildContext context) => monthSelectionView(callback: (String val){
-                            setState(() {
-                              durationTo = val;
-                            });
-                          }));
+                          if(!isCurrentlyWorkingHere) {
+                            showDialog(context: context, barrierDismissible: false,
+                                builder: (BuildContext context) => monthSelectionView(callback: (String val) {
+                                  setState(() {
+                                    durationTo = val;
+                                  });
+                                })
+                            );
+                          }
                         },
                         child: Container(
                           padding: const EdgeInsets.all(18),
@@ -690,7 +705,7 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                         salarySlip.filename = "";
                         salarySlip.link = "";
                         salarySlip.filePath = element;
-                        salarySlipsImages?.add(salarySlip);
+                        salarySlipsImages.add(salarySlip);
                       }
                     });
                   }),
@@ -702,7 +717,7 @@ class _ExpierenceViewState extends State<ExpierenceView> {
                         otherAttachment.filename = "";
                         otherAttachment.link = "";
                         otherAttachment.filePath = element;
-                        otherAttachmentsImages?.add(otherAttachment);
+                        otherAttachmentsImages.add(otherAttachment);
                       }
                     });
                   }),

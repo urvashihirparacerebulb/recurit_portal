@@ -97,8 +97,9 @@ class _IdentificationViewState extends State<IdentificationView> {
                     color: blackColor.withOpacity(0.4),
                     isChangeColor: true
                 ) : Expanded(child: (selectedIdentification != null && selectedFile == null) ?
-                Image.network(selectedIdentification!.attachment ?? "", height: 100) :
-                Image.file(selectedFile!, height: 100))
+                  Image.network(selectedIdentification!.attachment ?? "", height: 100) :
+                  Image.file(selectedFile!, height: 100)
+                )
               ],
             ),
           ),
@@ -165,7 +166,7 @@ class _IdentificationViewState extends State<IdentificationView> {
               child: InkWell(
                   onTap: () async {
                     Get.back();
-                    var tempDir = await getTemporaryDirectory();
+                    var tempDir = await getApplicationDocumentsDirectory();
                     String fullPath = tempDir.path;
                     if(identification.attachment != null && identification.attachment!.isNotEmpty){
                       download2(APIProvider.getDio(), identification.attachment ?? "", fullPath);
@@ -178,7 +179,8 @@ class _IdentificationViewState extends State<IdentificationView> {
                       const Text('Download'),
                     ],
                   )
-              ))
+              )
+          )
         ],
         elevation: 8.0
     );

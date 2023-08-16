@@ -36,6 +36,7 @@ class AddressController extends GetxController {
   }
 
   void getStatesList({String? countryId, Function? callback}) {
+    statesList.clear();
     apiServiceCall(
         params: {
           "country_id": countryId
@@ -55,6 +56,7 @@ class AddressController extends GetxController {
   }
 
   void getCitiesList({String? stateId, Function? callback}) {
+    citiesList.clear();
     apiServiceCall(
         params: {
           "state_id": stateId

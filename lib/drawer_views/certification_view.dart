@@ -163,7 +163,7 @@ class _CertificationViewState extends State<CertificationView> {
               child: InkWell(
                   onTap: () async {
                     Get.back();
-                    var tempDir = await getTemporaryDirectory();
+                    var tempDir = await getApplicationDocumentsDirectory();
                     String fullPath = tempDir.path;
                     if(certification.attachment != null && certification.attachment!.isNotEmpty){
                       download2(APIProvider.getDio(), certification.attachment ?? "", fullPath);

@@ -116,7 +116,7 @@ class _AddressViewState extends State<AddressView> {
                     children: [
                       commonFillButtonView(
                           context: context,
-                          title: "EDIT",
+                          title: "SAVE",
                           width: 70, height: 35,
                           tapOnButton: () {
                             CandidateController.to.updateAddressView(
@@ -212,7 +212,7 @@ class _AddressViewState extends State<AddressView> {
                     commonBottomView(context: context,
                         child: AddressBottomView(
                             title: "Zip/Postal Code *",
-                            myItems: AddressController.to.pinCodesList.value,
+                            myItems: AddressController.to.pinCodesList,
                             selectionCallBack: (CountryState val) {
                             AddressController.to.getAddressFromPinCode(
                               pinCode: val.pinCodeNo ?? "",
@@ -264,7 +264,11 @@ class _AddressViewState extends State<AddressView> {
                                 cityId: selectedCity?.id,
                                 pinCode: pin,
                                 callback: (){
-                                  AddressController.to.getPinCodesList(callback: (){});
+                                  AddressController.to.getPinCodesList(callback: (){
+                                    setState(() {
+                                      selectedZipcode = AddressController.to.pinCodesList.last;
+                                    });
+                                  });
                                 }
                               );
                             }));
@@ -278,7 +282,7 @@ class _AddressViewState extends State<AddressView> {
                   fieldTitleText: "Country",
                   hintText: "Country",
                   isEnabled: false,
-                  textEditingController: countryController,
+                  textEditingController: countryController..text = (selectedCountry == null ? "" : selectedCountry!.name ?? ""),
                   onChangedFunction: (String value){
                   },
                   validationFunction: (String value) {
@@ -291,7 +295,7 @@ class _AddressViewState extends State<AddressView> {
                   fieldTitleText: "State/Province",
                   hintText: "State/Province",
                   isEnabled: false,
-                  textEditingController: stateController,
+                  textEditingController: stateController..text = (selectedState == null ? "" : selectedState!.name ?? ""),
                   onChangedFunction: (String value){
                   },
                   validationFunction: (String value) {
@@ -305,7 +309,7 @@ class _AddressViewState extends State<AddressView> {
                   fieldTitleText: "City",
                   hintText: "City",
                   isEnabled: false,
-                  textEditingController: cityController,
+                  textEditingController: cityController..text = (selectedCity == null ? "" : selectedCity!.name ?? ""),
                   onChangedFunction: (String value){
                   },
                   validationFunction: (String value) {
@@ -422,7 +426,11 @@ class _AddressViewState extends State<AddressView> {
                                   cityId: selectedCity?.id,
                                   pinCode: pin,
                                   callback: (){
-                                    AddressController.to.getPinCodesList(callback: (){});
+                                    AddressController.to.getPinCodesList(callback: (){
+                                      setState(() {
+                                        correspondenceSelectedZipcode = AddressController.to.pinCodesList.last;
+                                      });
+                                    });
                                   }
                               );
                             }));
@@ -437,7 +445,7 @@ class _AddressViewState extends State<AddressView> {
                   fieldTitleText: "Country",
                   hintText: "Country",
                   isEnabled: false,
-                  textEditingController: correspondenceCountryController,
+                  textEditingController: correspondenceCountryController..text = (correspondenceSelectedCountry == null ? "" : correspondenceSelectedCountry!.name ?? ""),
                   onChangedFunction: (String value){
                   },
                   validationFunction: (String value) {
@@ -450,7 +458,7 @@ class _AddressViewState extends State<AddressView> {
                   fieldTitleText: "State/Province",
                   hintText: "State/Province",
                   isEnabled: false,
-                  textEditingController: correspondenceStateController,
+                  textEditingController: correspondenceStateController..text = (correspondenceSelectedState == null ? "" : correspondenceSelectedState!.name ?? ""),
                   onChangedFunction: (String value){
                   },
                   validationFunction: (String value) {
@@ -463,7 +471,7 @@ class _AddressViewState extends State<AddressView> {
                   fieldTitleText: "City",
                   hintText: "City",
                   isEnabled: false,
-                  textEditingController: correspondenceCityController,
+                  textEditingController: correspondenceCityController..text = (correspondenceSelectedCity == null ? "" : correspondenceSelectedCity!.name ?? ""),
                   onChangedFunction: (String value){
                   },
                   validationFunction: (String value) {

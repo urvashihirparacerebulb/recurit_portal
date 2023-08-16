@@ -117,7 +117,8 @@ class _AttachmentsViewState extends State<AttachmentsView> {
                     title: "No File Chosen",
                     color: blackColor.withOpacity(0.4),
                     isChangeColor: true
-                ) : Image.network((title == "Resume" ? (selectedAttachment!.resume ?? "") :
+                ) : GetUtils.isPDF(title == "Resume" ? (selectedAttachment!.resume ?? "") :
+                (selectedAttachment!.coverLetter ?? "")) ? const Icon(Icons.picture_as_pdf_outlined,color: dangerColor,size: 40) : Image.network((title == "Resume" ? (selectedAttachment!.resume ?? "") :
                 (selectedAttachment!.coverLetter ?? "")), height: 100) : selectedFile == null ? commonHeaderTitle(
                     title: "No File Chosen",
                     color: blackColor.withOpacity(0.4),
@@ -319,6 +320,7 @@ class _AttachmentsViewState extends State<AttachmentsView> {
               setState(() {
                 for (var element in filePaths) {
                   ImageModel otherAttachment = ImageModel();
+
                   otherAttachment.filename = "";
                   otherAttachment.link = "";
                   otherAttachment.filePath = element;

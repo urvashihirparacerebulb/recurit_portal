@@ -140,6 +140,10 @@ class _FamilyDetailsViewState extends State<FamilyDetailsView> {
                       tapOnButton: () {
                         setState(() {
                           isAdd = true;
+                          nameController.text = "";
+                          occupationController.text = "";
+                          relationController.text = "";
+                          emailController.text = "";mobileController.text = "";
                         });
                       },
                       isLoading: false)

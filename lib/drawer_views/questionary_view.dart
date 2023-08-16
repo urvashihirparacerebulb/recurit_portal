@@ -26,14 +26,14 @@ class _QuestionaryViewState extends State<QuestionaryView> {
   void initState() {
     CandidateController.to.getCandidateQuestionaryInfo(callback: (){
       var val = CandidateController.to.candidateDetail.value;
-      isReadyToRelocate = val.relocateStatus == null ? false : (val.relocateStatus == "Yes" ? true : false);
-      isPermanentWFH = val.workFromHome == null ? false : (val.workFromHome == "Yes" ? true : false);
-      isCandidateAccept = val.bondStatus == null ? false : (val.bondStatus == "Yes" ? true : false);
+      isReadyToRelocate = val.relocateStatus == null ? false : (val.relocateStatus?.toLowerCase() == "yes" ? true : false);
+      isPermanentWFH = val.workFromHome == null ? false : (val.workFromHome?.toLowerCase() == "yes" ? true : false);
+      isCandidateAccept = val.bondStatus == null ? false : (val.bondStatus?.toLowerCase() == "yes" ? true : false);
       if(isCandidateAccept) {
-        expInYears = "${val.bondYears ?? ""} Years";
-        expInMonths = "${val.bondMonths ?? ""} Months";
+        expInYears = val.bondYears ?? "";
+        expInMonths = val.bondMonths ?? "";
       }
-      selectedNoticePeriod = "${val.noticePeriod ?? ""} Days";
+      selectedNoticePeriod = val.noticePeriod ?? "";
       setState(() {});
     });
     super.initState();
@@ -112,7 +112,8 @@ class _QuestionaryViewState extends State<QuestionaryView> {
                 ],
               ),
               commonVerticalSpacing(),
-              commonCheckBoxTile(title: "Ready to relocate?",callback: (bool val){
+              commonCheckBoxTile(
+                  title: "Ready to relocate?",callback: (bool val){
                 setState(() {
                   if(isEdit) {
                     isReadyToRelocate = val;

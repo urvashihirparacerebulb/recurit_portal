@@ -28,7 +28,7 @@ class QualificationView extends StatefulWidget {
 }
 
 class _QualificationViewState extends State<QualificationView> {
-  List<ImageModel>? markSheetImages = [];
+  List<ImageModel> markSheetImages = [];
   File? certificateImage;
   TextEditingController instituteNameController = TextEditingController();
   TextEditingController departmentNameController = TextEditingController();
@@ -113,7 +113,7 @@ class _QualificationViewState extends State<QualificationView> {
 
   multipleImageView({String title = "", Function? onChanged}) {
     return SizedBox(
-      height: markSheetImages!.isNotEmpty ? 180 : 80,
+      height: markSheetImages.isNotEmpty ? 180 : 80,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -165,26 +165,27 @@ class _QualificationViewState extends State<QualificationView> {
           commonVerticalSpacing(spacing: 8),
           Expanded(child: ListView.builder(
             shrinkWrap: true,
-            itemCount: markSheetImages?.length,
+            itemCount: markSheetImages.length,
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) {
-              if(markSheetImages![index].filePath == null){
+              if(markSheetImages[index].filePath == null){
                 return Row(
                   children: [
                     InkWell(
                       onTap: (){
-                        launchInBrowser(markSheetImages![index].link ?? "");
+                        launchInBrowser(markSheetImages[index].link ?? "");
                       },
-                      child: GetUtils.isPDF(markSheetImages![index].link ?? "") ?
-                      const Icon(Icons.picture_as_pdf_outlined,color: dangerColor,size: 100,) : Image.network(markSheetImages![index].link ?? "", height: 100),
+                      child: GetUtils.isPDF(markSheetImages[index].link ?? "") ?
+                      const Icon(Icons.picture_as_pdf_outlined,color: dangerColor,size: 100,) : Image.network(markSheetImages[index].link ?? "", height: 100),
                     ),
                     commonHorizontalSpacing(spacing: 20),
                     InkWell(
                       onTap: (){
                         CandidateController.to.deleteMarkSheetsInQualification(
                             qulId: selectedQualification?.id,
-                            docName: markSheetImages![index].filename ?? "",
+                            docName: markSheetImages[index].filename ?? "",
                             callback: () {
+                              markSheetImages.removeAt(index);
                               CandidateController.to.getQualificationsList();
                             }
                         );
@@ -195,7 +196,7 @@ class _QualificationViewState extends State<QualificationView> {
                   ],
                 );
               }
-              return Image.file(markSheetImages![index].filePath!, height: 100);
+              return Image.file(markSheetImages[index].filePath!, height: 100);
             },
           ))
         ],
@@ -231,7 +232,7 @@ class _QualificationViewState extends State<QualificationView> {
                       durationTo = qualification.toMonth ?? "";
                       isCurrentlyPersuing = qualification.persuing != null ? qualification.persuing == "Yes" ? true : false : false;
                       if(qualification.marksheet!.isNotEmpty){
-                        markSheetImages!.addAll(qualification.marksheet ?? []);
+                        markSheetImages.addAll(qualification.marksheet ?? []);
                       }
                     });
                   },
@@ -318,7 +319,7 @@ class _QualificationViewState extends State<QualificationView> {
                                         ),
                                         InkWell(
                                           onTap: () async {
-                                            var tempDir = await getTemporaryDirectory();
+                                            var tempDir = await getApplicationDocumentsDirectory();
                                             String fullPath = tempDir.path;
                                             if(qualification.marksheet!.isNotEmpty){
                                               download2(APIProvider.getDio(), qualification.marksheet![index].link ?? "", fullPath);
@@ -338,7 +339,7 @@ class _QualificationViewState extends State<QualificationView> {
                                     ),
                                     InkWell(
                                         onTap: () async {
-                                          var tempDir = await getTemporaryDirectory();
+                                          var tempDir = await getApplicationDocumentsDirectory();
                                           String fullPath = tempDir.path;
                                           if(qualification.certificate != null && qualification.certificate!.isNotEmpty){
                                             download2(APIProvider.getDio(), qualification.certificate ?? "", fullPath);
@@ -399,11 +400,13 @@ class _QualificationViewState extends State<QualificationView> {
                             qualificationId: selectedQualification != null ? selectedQualification!.id.toString() : "",
                             status: "Active",
                             certificate: certificateImage,
-                            markSheets: markSheetImages!.where((element) => element.filename != null).map((e) => e.filePath!).toList(),
+                            markSheets: markSheetImages.isEmpty ? [] : markSheetImages.where((element) => element.filename != null).map((e) => (e.filePath ?? File(""))).toList(),
                             callback: (){
                               CandidateController.to.getQualificationsList();
-                              isAdd = false;
-                              isEdit = false;
+                              setState(() {
+                                isAdd = false;
+                                isEdit = false;
+                              });
                             }
                         );
                       },
@@ -415,6 +418,12 @@ class _QualificationViewState extends State<QualificationView> {
                       tapOnButton: () {
                         setState(() {
                           isAdd = true;
+                          instituteNameController.text = "";
+                          departmentNameController.text = "";
+                          degreeNameController.text = "";
+                          durationFrom = ""; durationTo = "";isCurrentlyPersuing = false;
+                          markSheetImages.clear();
+                          certificateImage = null;
                         });
                       },
                       isLoading: false)
@@ -571,7 +580,7 @@ class _QualificationViewState extends State<QualificationView> {
                         markSheet.filename = "";
                         markSheet.link = "";
                         markSheet.filePath = element;
-                        markSheetImages?.add(markSheet);
+                        markSheetImages.add(markSheet);
                       }
                     });
                   }),

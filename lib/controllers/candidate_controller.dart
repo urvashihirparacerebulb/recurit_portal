@@ -955,9 +955,11 @@ class CandidateController extends GetxController {
 
     if(markSheets.isNotEmpty){
       for(int i = 0; i < markSheets.length; i++){
-        formData.files.add(
-            MapEntry("marksheet[$i]", await dio
-                .MultipartFile.fromFile(markSheets[i].path)));
+        if(markSheets[i].path != "") {
+          formData.files.add(
+              MapEntry("marksheet[$i]", await dio
+                  .MultipartFile.fromFile(markSheets[i].path)));
+        }
       }
     }
 
@@ -1020,16 +1022,20 @@ class CandidateController extends GetxController {
 
     if(salarySlips.isNotEmpty){
       for(int i = 0; i < salarySlips.length; i++){
-        formData.files.add(
-            MapEntry("salary_slip[$i]", await dio
-                .MultipartFile.fromFile(salarySlips[i].path)));
+        if(salarySlips[i].path != "") {
+          formData.files.add(
+              MapEntry("salary_slip[$i]", await dio
+                  .MultipartFile.fromFile(salarySlips[i].path)));
+        }
       }
     }
     if(otherAttachments.isNotEmpty){
       for(int i = 0; i < otherAttachments.length; i++){
-        formData.files.add(
-            MapEntry("other_attachement[$i]", await dio
-                .MultipartFile.fromFile(otherAttachments[i].path)));
+        if(otherAttachments[i].path != "") {
+          formData.files.add(
+              MapEntry("other_attachement[$i]", await dio
+                  .MultipartFile.fromFile(otherAttachments[i].path)));
+        }
       }
     }
 

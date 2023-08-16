@@ -158,7 +158,7 @@ class _AchievementsViewState extends State<AchievementsView> {
               child: InkWell(
                   onTap: () async {
                     Get.back();
-                    var tempDir = await getTemporaryDirectory();
+                    var tempDir = await getApplicationDocumentsDirectory();
                     String fullPath = tempDir.path;
                     if(achievement.attachment != null && achievement.attachment!.isNotEmpty){
                       download2(APIProvider.getDio(), achievement.attachment ?? "", fullPath);
@@ -207,8 +207,10 @@ class _AchievementsViewState extends State<AchievementsView> {
                             status: selectedAchievement != null ? selectedAchievement!.status : "Active",
                             callback: (){
                               CandidateController.to.getAchievementsInfo();
-                              isAdd = false;
-                              isEdit = false;
+                              setState(() {
+                                isAdd = false;
+                                isEdit = false;
+                              });
                             }
                         );
                       },
@@ -220,6 +222,10 @@ class _AchievementsViewState extends State<AchievementsView> {
                       tapOnButton: () {
                         setState(() {
                           isAdd = true;
+                          awardNameController.text = "";
+                          purposeController.text = "";
+                          orgFromController.text = "";
+                          remarksController.text = "";attachmentImage = null;
                         });
                       },
                       isLoading: false)

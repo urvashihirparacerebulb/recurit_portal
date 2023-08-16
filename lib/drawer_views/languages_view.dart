@@ -120,8 +120,10 @@ class _LanguagesViewState extends State<LanguagesView> {
                             status: "Active",
                             callback: (){
                               CandidateController.to.getLanguagesList();
-                              isAdd = false;
-                              isEdit = false;
+                              setState(() {
+                                isAdd = false;
+                                isEdit = false;
+                              });
                             }
                         );
                       },
@@ -133,6 +135,9 @@ class _LanguagesViewState extends State<LanguagesView> {
                       tapOnButton: () {
                         setState(() {
                           isAdd = true;
+                          languageNameController.text = "";
+                          isRead = false;
+                          isWrite = false;isSpeak = false;
                         });
                       },
                       isLoading: false)

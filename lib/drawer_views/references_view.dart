@@ -126,8 +126,10 @@ class _ReferencesViewState extends State<ReferencesView> {
                             status: "Active",
                             callback: (){
                               CandidateController.to.getReferencesList();
-                              isAdd = false;
-                              isEdit = false;
+                              setState(() {
+                                isAdd = false;
+                                isEdit = false;
+                              });
                             }
                         );
                       },
@@ -139,6 +141,11 @@ class _ReferencesViewState extends State<ReferencesView> {
                       tapOnButton: () {
                         setState(() {
                           isAdd = true;
+                          nameController.text = "";
+                          designationController.text = "";
+                          companyNameController.text = "";
+                          emailController.text = "";
+                          mobileController.text = "";
                         });
                       },
                       isLoading: false)

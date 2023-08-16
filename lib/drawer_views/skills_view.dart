@@ -59,7 +59,8 @@ class _SkillsViewState extends State<SkillsView> {
                           level: skill.level,
                           skill: skill.skill ?? "",
                           callback: (){
-                            CandidateController.to.skillsList.add(skill);
+                            CandidateController.to.getSkillsInfoList();
+                            // CandidateController.to.skillsList.add(skill);
                             skillsController.text = "";
                           }
                         );

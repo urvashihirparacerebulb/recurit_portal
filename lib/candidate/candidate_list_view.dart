@@ -1,5 +1,6 @@
 import 'package:cerebulb_recruit_portal/controllers/candidate_controller.dart';
 import 'package:cerebulb_recruit_portal/home_screen.dart';
+import 'package:cerebulb_recruit_portal/login/login_screen.dart';
 import 'package:cerebulb_recruit_portal/utility/color_utility.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -36,8 +37,9 @@ class _CandidateListViewState extends State<CandidateListView> {
             onTap: (){
               setIsLogin(isLogin: false);
               setObject(ApiConfig.loginPref, null);
+              Get.offAll(() => const LoginScreen());
             },
-            child: const Icon(Icons.logout,color: blackColor,),
+            child: const Icon(Icons.logout,color: blackColor),
           ),
         )]
       ),
